@@ -1,0 +1,46 @@
+{
+"entry": "forest2",
+"rooms": [
+    {
+        "id": "forest1",
+        "desc": "You're in forest1.",
+        "exits":
+        [
+            {
+                "id": "forest2",
+                "condition": ""
+            }
+        ]
+    },
+    {
+        "id": "forest2",
+        "desc": "You're in forest2.",
+        "exits":
+        [
+            {
+                "id": "forest1",
+                "condition": ""
+            },
+            {
+                "id": "forest3",
+                "condition": ""
+            }
+        ]
+    },
+    {
+        "id": "forest3",
+        "desc": "You're in forest3.",
+        "exits":
+        [
+            {
+                "id": "forest2",
+                "condition": ""
+            },
+            {
+                "id": "forest1",
+                "condition": ""
+            }
+        ]
+    }
+]
+}
