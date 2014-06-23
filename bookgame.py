@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+import getopt
 import logging
 
 rooms = {}
@@ -41,7 +42,7 @@ def loadData(bookDataFilename):
             
         return True
     else:
-        logging.error("DATA NOT FOUND!")
+        logging.error("'%s'DATA NOT FOUND!", bookDataFilename)
         return False
 
 def saveGame(bookDataFilename):
@@ -67,17 +68,30 @@ def printRoomDialog(room):
     exNum = input("Your choise:")
     if exNum < len(room["exits"]):
         currentRoomId = room["exits"][exNum]["id"]
-        saveGame(bookDataFilename)
 
 def main(argv):
-    logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+    bookDataFilename = ''
     
-    bookDataFilename = argv[0]
+    try:
+        opts, args = getopt.getopt(argv, "hi:d", ["ifile=", "debug"])
+    except getopt.GetoptError:
+        print 'bookgame.py -i <gamefile> -d'
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print 'bookgame.py -i <gamefile> -d'
+            sys.exit()
+        elif opt in ("-i", "--ifile"):
+            bookDataFilename = arg
+        elif opt in ("-d", "--debug"):
+            logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+    
     if loadData(bookDataFilename):
         while True:
             for room in rooms:
                 if room["id"] == currentRoomId:
                     printRoomDialog(room)
+                    saveGame(bookDataFilename)
         
 if __name__ == "__main__":
     main(sys.argv[1:])
