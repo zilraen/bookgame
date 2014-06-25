@@ -17,32 +17,39 @@ def loadData(bookDataFilename):
     
     logging.info("%s opening...", bookDataFilename)
     if os.path.isfile(bookDataFilename):
-        fbook = open(bookDataFilename, 'r')
-        s = fbook.read()
-
-        bookJson = json.loads(s)
-        entry = bookJson["entry"]
-        rooms = bookJson["rooms"]
-        fbook.close()
+        with open(bookDataFilename, 'r') as fbook:
+            try:
+                s = fbook.read()
+                bookJson = json.loads(s)
+                entry = bookJson["entry"]
+                rooms = bookJson["rooms"]
+                fbook.close()
+            
+            except :
+                logging.error("File '%s' could not be opened!", bookDataFilename)
+                sys.exit(2)
         
         currentRoomId = entry
 
         saveFilename = getSaveFilename(bookDataFilename)
         if os.path.isfile(saveFilename):
-            fsave = open(saveFilename, 'r')
-            s = fsave.read()
-        
-            if len(s) != 0:
-                logging.info("savedata:\n%s\n loaded!", s)
-                saveJson = json.loads(s)
-                currentRoomId = saveJson["cur_room"]
-                logging.info("current room id: %s", currentRoomId)
-
-            fsave.close()
+            with open(saveFilename, 'r') as fsave:
+                try:
+                    s = fsave.read()
+            
+                    if len(s) != 0:
+                        logging.info("savedata:\n%s\n loaded!", s)
+                        saveJson = json.loads(s)
+                        currentRoomId = saveJson["cur_room"]
+                        logging.info("current room id: %s", currentRoomId)
+    
+                    fsave.close()
+                except :
+                    logging.error("Save file '%s' could not be opened!\n Using default params.", saveFilename)
             
         return True
     else:
-        logging.error("'%s'DATA NOT FOUND!", bookDataFilename)
+        logging.error("Data file '%s' is not exist!", bookDataFilename)
         return False
 
 def saveGame(bookDataFilename):
