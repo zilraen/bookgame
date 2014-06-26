@@ -149,6 +149,10 @@
                                     "events":
                                     [
                                         {
+                                            "type": "mobremove",
+                                            "param": "dragon@mount1"
+                                        },
+                                        {
                                             "type": "skillinc",
                                             "param": "melee"
                                         },
