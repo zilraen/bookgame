@@ -46,7 +46,7 @@
         [
             {
                 "id": "forest2",
-                "events": []
+                "event": {}
             }
         ]
     },
@@ -57,7 +57,7 @@
         [
             {
                 "id": "forest1",
-                "events": []
+                "event": {}
             },
             {
                 "id": "mount1",
