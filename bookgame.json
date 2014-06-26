@@ -20,6 +20,12 @@
             "name": "Melee",
             "desc": "Used to battle with somebody in melee.",
             "startvalue": 3
+        },
+        {
+            "id": "dancing",
+            "name": "Dancing",
+            "desc": "Used to dance. Not used yet, added as an example of skill that is require unlock.",
+            "startvalue": 0
         }
     ]
 },
