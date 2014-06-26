@@ -70,6 +70,8 @@ def saveGame(bookDataFilename):
     fsave.close()
     
 def printRoomDialog(room):
+    global currentRoomId
+    
     print room["desc"]
     print "___________"
     print "Possible exits:"
@@ -94,10 +96,19 @@ def tryLeaveRoom(exit):
 def runEvent(event):
     global player
     
-    if event["type"] == "damage":
-        tryKill(player, event["param"])
-    elif event["type"] == "skillcheck":
-        return checkSkill(player, event["param"], event["modifier"])
+    try:
+        print event["text"]
+    except:
+        logging.debug("Event %s text not found!", str(event))
+        
+    try:
+        if event["type"] == "damage":
+            tryKill(player, event["param"])
+        elif event["type"] == "skillcheck":
+            return checkSkill(player, event["param"], event["modifier"])
+    except:
+        logging.debug("Event %s type not found!", str(event))
+        
     return True
 
 def tryKill(pretender, amount):
@@ -108,6 +119,7 @@ def tryKill(pretender, amount):
     return False
 
 def checkSkill(pretender, skillid, mod):
+    logging.debug("checkskill: %s, mod: %d", skillid, mod)
     return True
 
 def main(argv):
