@@ -13,7 +13,7 @@ def getSaveFilename(bookDataFilename):
     saveGameFilename = bookDataFilename.split(".")[0] + ".sav"
     return saveGameFilename
 
-def loadData(bookDataFilename):        
+def loadData(bookDataFilename, needLoadSave):        
     global rooms
     global player
     global mobs
@@ -37,7 +37,7 @@ def loadData(bookDataFilename):
                 sys.exit(2)
 
         saveFilename = getSaveFilename(bookDataFilename)
-        if os.path.isfile(saveFilename):
+        if os.path.isfile(saveFilename) and needLoadSave:
             with open(saveFilename, 'r') as fsave:
                 try:
                     s = fsave.read()
@@ -112,9 +112,10 @@ def checkSkill(pretender, skillid, mod):
 
 def main(argv):
     bookDataFilename = ''
+    needLoadSave = True
     
     try:
-        opts, args = getopt.getopt(argv, "hi:d", ["ifile=", "debug"])
+        opts, args = getopt.getopt(argv, "hi:dn", ["ifile=", "debug", "newgame"])
     except getopt.GetoptError:
         print 'bookgame.py -i <gamefile> -d'
         sys.exit(2)
@@ -126,8 +127,10 @@ def main(argv):
             bookDataFilename = arg
         elif opt in ("-d", "--debug"):
             logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+        elif opt in ("-n", "--newgame"):
+            needLoadSave = False            
     
-    if loadData(bookDataFilename):
+    if loadData(bookDataFilename, needLoadSave):
         while True:
             for room in rooms:
                 if room["id"] == currentRoomId:
