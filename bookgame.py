@@ -5,6 +5,8 @@ import getopt
 import logging
 
 rooms = {}
+player = {}
+mobs = {}
 currentRoomId = ""
 
 def getSaveFilename(bookDataFilename):
@@ -13,43 +15,40 @@ def getSaveFilename(bookDataFilename):
 
 def loadData(bookDataFilename):        
     global rooms
+    global player
+    global mobs
     global currentRoomId
     
     logging.info("%s opening...", bookDataFilename)
     if os.path.isfile(bookDataFilename):
-        with open(bookDataFilename, 'r') as fbook:
-            try:
-                s = fbook.read()
-                bookJson = json.loads(s)
-                entry = bookJson["entry"]
-                rooms = bookJson["rooms"]
-                fbook.close()
-            
-            except :
-                logging.error("File '%s' could not be opened!", bookDataFilename)
-                sys.exit(2)
+        fbook = open(bookDataFilename, 'r')
+        s = fbook.read()
+
+        bookJson = json.loads(s)
+        entry = bookJson["entry"]
+        rooms = bookJson["rooms"]
+        player = bookJson["player"]
+        mobs = bookJson["mobs"]
+        fbook.close()
         
         currentRoomId = entry
 
         saveFilename = getSaveFilename(bookDataFilename)
         if os.path.isfile(saveFilename):
-            with open(saveFilename, 'r') as fsave:
-                try:
-                    s = fsave.read()
-            
-                    if len(s) != 0:
-                        logging.info("savedata:\n%s\n loaded!", s)
-                        saveJson = json.loads(s)
-                        currentRoomId = saveJson["cur_room"]
-                        logging.info("current room id: %s", currentRoomId)
-    
-                    fsave.close()
-                except :
-                    logging.error("Save file '%s' could not be opened!\n Using default params.", saveFilename)
+            fsave = open(saveFilename, 'r')
+            s = fsave.read()
+        
+            if len(s) != 0:
+                logging.info("savedata:\n%s\n loaded!", s)
+                saveJson = json.loads(s)
+                currentRoomId = saveJson["cur_room"]
+                logging.info("current room id: %s", currentRoomId)
+
+            fsave.close()
             
         return True
     else:
-        logging.error("Data file '%s' is not exist!", bookDataFilename)
+        logging.error("'%s'DATA NOT FOUND!", bookDataFilename)
         return False
 
 def saveGame(bookDataFilename):
@@ -74,7 +73,22 @@ def printRoomDialog(room):
         print int(idx), ":", exit["id"]
     exNum = input("Your choise:")
     if exNum < len(room["exits"]):
-        currentRoomId = room["exits"][exNum]["id"]
+        exit = room["exits"][exNum]
+        if tryLeaveRoom(room, exit):
+            currentRoomId = exit["id"]
+
+def tryLeaveRoom(room, exit)
+    if exit["event"] != {}:
+        if runEvent(exit["event"]):
+            runEvent(exit["event"]["success"])
+            return True
+        else:
+            runEvent(exit["event"]["fail"])
+            return False
+    return True
+    
+def runEvent(event)
+    return True
 
 def main(argv):
     bookDataFilename = ''
