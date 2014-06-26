@@ -1,5 +1,44 @@
 {
 "entry": "forest2",
+"player": {
+    "hp": 5,
+	"minValToSuccess": 5,
+    "skills": [
+        {
+            "id": "sneaking",
+            "name": "Sneaking",
+            "desc": "Used to sneak somewhere.",
+            "value": 3
+        },
+        {
+            "id": "climbing",
+            "name": "Climbing",
+            "desc": "Used to climb somewhere.",
+            "value": 3
+        },
+        {
+            "id": "melee",
+            "name": "Melee",
+            "desc": "Used to battle with somebody in melee.",
+            "value": 3
+        },
+        {
+            "id": "dancing",
+            "name": "Dancing",
+            "desc": "Used to dance. Not used yet, added as an example of skill that is require unlock.",
+            "value": 0
+        }
+    ]
+},
+"mobs": [
+    {
+        "id": "dragon",
+        "name": "Dragon",
+        "desc": "An ancient dragon, dread and terrifying!",
+        "hp": 2,
+        "modifier": -5
+    }
+],
 "rooms": [
     {
         "id": "forest1",
@@ -8,7 +47,7 @@
         [
             {
                 "id": "forest2",
-                "condition": ""
+                "event": {}
             }
         ]
     },
@@ -19,26 +58,126 @@
         [
             {
                 "id": "forest1",
-                "condition": ""
+                "event": {}
             },
             {
-                "id": "forest3",
-                "condition": ""
+                "id": "mount1",
+                "event":
+                {
+                    "text": "You decided to climb the mount1.",
+                    "type": "skillcheck",
+                    "param": "climbing",
+                    "modifier": 1,
+                    "success":
+                    {
+                        "text": "You sucessfully climb on the mount1.",
+                        "events":
+						[
+							{
+                                "type": "skillinc",
+                                "param": "climbing"
+                            }
+						]
+                    },
+                    "fail":
+                    {
+                        "text": "You fall on a ground.",
+                        "events":
+                        [
+                            {
+                                "type": "damage",
+                                "param": 1
+                            }
+                        ]
+                    }
+                }
             }
         ]
     },
     {
-        "id": "forest3",
-        "desc": "You're in forest3.",
+        "id": "mount1",
+        "desc": "You're in mount1.",
         "exits":
         [
             {
                 "id": "forest2",
-                "condition": ""
+                "event":
+                {
+                    "type": "mobbattle",
+                    "param": "dragon",
+                    "modifier": 5,
+                    "success":
+                    {
+                        "text": "You killed the dragon and went down to forest2.",
+                        "events":
+                        [
+                            {
+                                "type": "mobremove",
+                                "param": "dragon@mount1"
+                            },
+                            {
+                                "type": "skillinc",
+                                "param": "melee"
+                            }
+                        ]
+                    },
+                    "fail":
+                    {
+                        "text": "You retired.",
+                        "events": []
+                    }
+                }
             },
             {
                 "id": "forest1",
-                "condition": ""
+                "event":
+                {
+                    "text": "You decided to sneak pass the dragon.",
+                    "type": "skillcheck",
+                    "param": "sneaking",
+                    "modifier": -2,
+                    "success":
+                    {
+                        "text": "You sucessfully passed the dragon.",
+                        "events": []
+                    },
+                    "fail":
+                    {
+                        "text": "The dragon noticed you! Prepare to battle!",
+                        "events":
+                        [
+                            {
+                                "type": "mobbattle",
+                                "param": "dragon",
+                                "modifier": 0,
+                                "success":
+                                {
+                                    "text": "You killed the dragon and went down to forest1. During your descent you understood what helped the dragon to notice you.",
+                                    "events":
+                                    [
+                                        {
+                                            "type": "mobremove",
+                                            "param": "dragon@mount1"
+                                        },
+                                        {
+                                            "type": "skillinc",
+                                            "param": "melee"
+                                        },
+                                        {
+                                            "type": "skillinc",
+                                            "param": "sneaking"
+                                        }
+                                    ]
+                                },
+                                "fail":
+                                {
+                                    "text": "You retired.",
+                                    "events": []
+                                }
+                            }
+                        ]
+                    }
+                }
             }
         ]
     }
