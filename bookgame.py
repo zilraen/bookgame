@@ -32,7 +32,7 @@ def loadData(bookDataFilename):
                 fbook.close()
                 
                 currentRoomId = entry
-             except :
+            except:
                 logging.error("File '%s' could not be opened!", bookDataFilename)
                 sys.exit(2)
 
@@ -52,7 +52,7 @@ def loadData(bookDataFilename):
             
         return True
     else:
-        logging.error("'%s'DATA NOT FOUND!", bookDataFilename)
+        logging.error("Data file '%s' is not exist!", bookDataFilename)
         return False
 
 def saveGame(bookDataFilename):
@@ -78,10 +78,10 @@ def printRoomDialog(room):
     exNum = input("Your choise:")
     if exNum < len(room["exits"]):
         exit = room["exits"][exNum]
-        if tryLeaveRoom(room, exit):
+        if tryLeaveRoom(exit):
             currentRoomId = exit["id"]
 
-def tryLeaveRoom(room, exit)
+def tryLeaveRoom(exit):
     if exit["event"] != {}:
         if runEvent(exit["event"]):
             runEvent(exit["event"]["success"])
@@ -91,7 +91,7 @@ def tryLeaveRoom(room, exit)
             return False
     return True
     
-def runEvent(event)
+def runEvent(event):
     global player
     
     if event["type"] == "damage":
@@ -100,14 +100,14 @@ def runEvent(event)
         return checkSkill(player, event["param"], event["modifier"])
     return True
 
-def tryKill(pretender, amount)
+def tryKill(pretender, amount):
     pretender["hp"] -= amount
     if pretender["hp"] <= 0:
         #pretender is dead
         return True
     return False
 
-def checkSkill(pretender, skillid, mod)
+def checkSkill(pretender, skillid, mod):
     return True
 
 def main(argv):
