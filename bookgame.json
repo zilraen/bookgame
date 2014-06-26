@@ -34,6 +34,7 @@
         "id": "dragon",
         "name": "Dragon",
         "desc": "An ancient dragon, dread and terrifying!",
+        "hp": 2,
         "modifier": -5
     }
 ],
@@ -45,7 +46,7 @@
         [
             {
                 "id": "forest2",
-                "event": {}
+                "events": []
             }
         ]
     },
@@ -56,7 +57,7 @@
         [
             {
                 "id": "forest1",
-                "event": {}
+                "events": []
             },
             {
                 "id": "mount1",
@@ -69,16 +70,18 @@
                     "success":
                     {
                         "text": "You sucessfully climb on the mount1.",
-                        "event": {}
+                        "events": []
                     },
                     "fail":
                     {
                         "text": "You fall on a ground.",
-                        "event":
-                        {
-                            "type": "damage",
-                            "param": 1
-                        }
+                        "events":
+                        [
+                            {
+                                "type": "damage",
+                                "param": 1
+                            }
+                        ]
                     }
                 }
             }
@@ -99,15 +102,22 @@
                     "success":
                     {
                         "text": "You killed the dragon and went down to forest2.",
-                        "event": {
-                            "type": "mobremove",
-                            "param": "dragon@mount1"
-                        }
+                        "events":
+                        [
+                            {
+                                "type": "mobremove",
+                                "param": "dragon@mount1"
+                            },
+                            {
+                                "type": "skillinc",
+                                "param": "melee"
+                            }
+                        ]
                     },
                     "fail":
                     {
                         "text": "You retired.",
-                        "event": {}
+                        "events": []
                     }
                 }
             },
@@ -122,27 +132,39 @@
                     "success":
                     {
                         "text": "You sucessfully passed the dragon.",
-                        "event": {}
+                        "events": []
                     },
                     "fail":
                     {
                         "text": "The dragon noticed you! Prepare to battle!",
-                        "event":
-                        {
-                            "type": "mobbattle",
-                            "param": "dragon",
-                            "modifier": 0,
-                            "success":
+                        "events":
+                        [
                             {
-                                "text": "You killed the dragon and went down to forest1",
-                                "event": {}
-                            },
-                            "fail":
-                            {
-                                "text": "You retired.",
-                                "event": {}
+                                "type": "mobbattle",
+                                "param": "dragon",
+                                "modifier": 0,
+                                "success":
+                                {
+                                    "text": "You killed the dragon and went down to forest1. During your descent you understood what helped the dragon to notice you.",
+                                    "events":
+                                    [
+                                        {
+                                            "type": "skillinc",
+                                            "param": "melee"
+                                        },
+                                        {
+                                            "type": "skillinc",
+                                            "param": "sneaking"
+                                        }
+                                    ]
+                                },
+                                "fail":
+                                {
+                                    "text": "You retired.",
+                                    "events": []
+                                }
                             }
-                        }
+                        ]
                     }
                 }
             }
