@@ -3,6 +3,7 @@ import os
 import sys
 import getopt
 import logging
+import random
 
 rooms = {}
 player = {}
@@ -12,6 +13,16 @@ currentRoomId = ""
 def getSaveFilename(bookDataFilename):
     saveGameFilename = bookDataFilename.split(".")[0] + ".sav"
     return saveGameFilename
+
+def diceroll(dice):
+    params = dice.split("d", 2)
+    count = int(params[0])
+    sides = int(params[1])
+    result = 0
+    while count > 0:
+        result += random.randint(1, sides)
+        count -= 1
+    return result
 
 def loadData(bookDataFilename, needLoadSave):        
     global rooms
@@ -41,11 +52,14 @@ def loadData(bookDataFilename, needLoadSave):
             with open(saveFilename, 'r') as fsave:
                 try:
                     s = fsave.read()
-                    logging.info("savedata:\n%s\n loaded!", s)
+                    logging.info("savedata:\n%s\n loading:", s)
                     saveJson = json.loads(s)
-                    currentRoomId = saveJson["cur_room"]
-                    logging.info("current room id: %s", currentRoomId)
-     
+                    if "cur_room" in saveJson:
+                        currentRoomId = saveJson["cur_room"]
+                        logging.info("current room id: %s", currentRoomId)
+                    if "player" in saveJson:
+                        player = json.loads(saveJson["player"])
+                        logging.info("player data: %s", str(player))
                     fsave.close()
                 except :
                      logging.error("Save file '%s' could not be opened!\n Using default params.", saveFilename)
@@ -60,6 +74,7 @@ def saveGame(bookDataFilename):
     
     savegame = {}       
     savegame["cur_room"] = currentRoomId
+    savegame["player"] = player
     
     ssave = json.dumps(savegame)
     logging.debug("SAVED:\n%s\n------------", ssave)
@@ -96,20 +111,31 @@ def tryLeaveRoom(exit):
 def runEvent(event):
     global player
     
-    try:
+    result = True
+    
+    if "text" in event:
         print event["text"]
-    except:
-        logging.debug("Event %s text not found!", str(event))
+    else:
+        logging.debug("Event '%s' text not found!", str(event))
         
-    try:
+    if "type" in event:
         if event["type"] == "damage":
             tryKill(player, event["param"])
         elif event["type"] == "skillcheck":
-            return checkSkill(player, event["param"], event["modifier"])
-    except:
-        logging.debug("Event %s type not found!", str(event))
-        
-    return True
+            result = checkSkill(player, event["param"], event["modifier"])
+        elif event["type"] == "skillinc":
+            incSkill(player, event["param"])
+            
+        logging.debug("Event '%s' result: %s", event["type"], str(result))
+    else:
+        logging.debug("Event '%s' type not found!", str(event))
+    
+    if "events" in event:
+        for subevent in event["events"]:
+            runEvent(subevent)
+    else:
+        logging.debug("Event '%s' subevents not found!", str(event))
+    return result
 
 def tryKill(pretender, amount):
     pretender["hp"] -= amount
@@ -119,8 +145,24 @@ def tryKill(pretender, amount):
     return False
 
 def checkSkill(pretender, skillid, mod):
-    logging.debug("checkskill: %s, mod: %d", skillid, mod)
-    return True
+    for skill in pretender["skills"]:
+        if skill["id"] == skillid:
+            skillbase = skill["value"]
+            skillval = skillbase + mod
+            valtosuccess = pretender["minValToSuccess"]
+            logging.debug("checkskill: %s, pretenders skill: %d + %d = %d", skillid, skillbase, mod, skillval)
+            for i in range(0, skillval):
+                dice = diceroll("1d6")
+                logging.debug("dice: %d/%d", dice, valtosuccess)
+                if dice >= valtosuccess:
+                    return True
+            break
+    return False
+
+def incSkill(pretender, skillid):
+    for skill in pretender["skills"]:
+        if skill["id"] == skillid:
+            skill["value"] += 1
 
 def main(argv):
     bookDataFilename = ''
