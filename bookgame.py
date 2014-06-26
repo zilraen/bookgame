@@ -21,30 +21,34 @@ def loadData(bookDataFilename):
     
     logging.info("%s opening...", bookDataFilename)
     if os.path.isfile(bookDataFilename):
-        fbook = open(bookDataFilename, 'r')
-        s = fbook.read()
-
-        bookJson = json.loads(s)
-        entry = bookJson["entry"]
-        rooms = bookJson["rooms"]
-        player = bookJson["player"]
-        mobs = bookJson["mobs"]
-        fbook.close()
-        
-        currentRoomId = entry
+        with open(bookDataFilename, 'r') as fbook:
+            try:
+                s = fbook.read()
+                bookJson = json.loads(s)
+                entry = bookJson["entry"]
+                rooms = bookJson["rooms"]
+                player = bookJson["player"]
+                mobs = bookJson["mobs"]
+                fbook.close()
+                
+                currentRoomId = entry
+             except :
+                logging.error("File '%s' could not be opened!", bookDataFilename)
+                sys.exit(2)
 
         saveFilename = getSaveFilename(bookDataFilename)
         if os.path.isfile(saveFilename):
-            fsave = open(saveFilename, 'r')
-            s = fsave.read()
-        
-            if len(s) != 0:
-                logging.info("savedata:\n%s\n loaded!", s)
-                saveJson = json.loads(s)
-                currentRoomId = saveJson["cur_room"]
-                logging.info("current room id: %s", currentRoomId)
-
-            fsave.close()
+            with open(saveFilename, 'r') as fsave:
+                try:
+                    s = fsave.read()
+                    logging.info("savedata:\n%s\n loaded!", s)
+                    saveJson = json.loads(s)
+                    currentRoomId = saveJson["cur_room"]
+                    logging.info("current room id: %s", currentRoomId)
+     
+                    fsave.close()
+                except :
+                     logging.error("Save file '%s' could not be opened!\n Using default params.", saveFilename)
             
         return True
     else:
@@ -88,6 +92,22 @@ def tryLeaveRoom(room, exit)
     return True
     
 def runEvent(event)
+    global player
+    
+    if event["type"] == "damage":
+        tryKill(player, event["param"])
+    elif event["type"] == "skillcheck":
+        return checkSkill(player, event["param"], event["modifier"])
+    return True
+
+def tryKill(pretender, amount)
+    pretender["hp"] -= amount
+    if pretender["hp"] <= 0:
+        #pretender is dead
+        return True
+    return False
+
+def checkSkill(pretender, skillid, mod)
     return True
 
 def main(argv):
