@@ -152,7 +152,7 @@ def checkSkill(pretender, skillid, mod):
             valtosuccess = pretender["minValToSuccess"]
             logging.debug("checkskill: %s, pretenders skill: %d + %d = %d", skillid, skillbase, mod, skillval)
             for i in range(0, skillval):
-                dice = diceroll("1d6")
+                dice = diceroll(pretender["diceToSkillcheck"])
                 logging.debug("dice: %d/%d", dice, valtosuccess)
                 if dice >= valtosuccess:
                     return True
