@@ -91,7 +91,7 @@ def printRoomDialog(room):
     print "___________"
     print "Possible exits:"
     for idx, exit in enumerate(room["exits"]):
-        print int(idx), ":", exit["id"]
+        print int(idx), ": ", getExitDescription(exit)
     exNum = input("Your choise:")
     if exNum < len(room["exits"]):
         exit = room["exits"][exNum]
@@ -163,6 +163,17 @@ def incSkill(pretender, skillid):
     for skill in pretender["skills"]:
         if skill["id"] == skillid:
             skill["value"] += 1
+            
+def getExitDescription(exit):
+    desc = exit["id"]
+    if exit["event"] != {}:
+        extended = ""
+        if exit["event"]["type"] == "mobbattle":
+            extended = " (melee)"
+        elif exit["event"]["type"] == "skillcheck":
+            extended = " (" + exit["event"]["param"] + ")"
+        desc += extended
+    return desc
 
 def main(argv):
     bookDataFilename = ''
