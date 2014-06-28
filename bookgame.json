@@ -2,7 +2,8 @@
 "entry": "forest2",
 "player": {
     "hp": 5,
-	"minValToSuccess": 5,
+    "minValToSuccess": 5,
+    "diceToSkillcheck": "1d6",
     "skills": [
         {
             "id": "sneaking",
@@ -34,7 +35,14 @@
     {
         "id": "dragon",
         "name": "Dragon",
-        "desc": "An ancient dragon, dread and terrifying!",
+        "desc":
+        {
+        	"default": "An ancient dragon, dread and terrifying!",
+        	"onappear":
+        	{
+        		"mount1": "When you climbed the mount, you see that a great dragon came out from a cave and lay on a warm stones. Now he don't see you, but if you attempt to descent, he'll most likely notice you."
+        	}
+        },
         "hp": 2,
         "modifier": -5
     }
