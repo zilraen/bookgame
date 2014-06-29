@@ -86,8 +86,13 @@ def saveGame(bookDataFilename):
     
 def printRoomDialog(room):
     global currentRoomId
-    
+    print "________________________"
     print room["desc"]
+    
+    encounter = getRoomEncounter(room)
+    if encounter != "":
+        print encounter
+        
     print "___________"
     print "Possible exits:"
     for idx, exit in enumerate(room["exits"]):
@@ -168,12 +173,44 @@ def getExitDescription(exit):
     desc = exit["id"]
     if exit["event"] != {}:
         extended = ""
+        skillid = ""
         if exit["event"]["type"] == "mobbattle":
-            extended = " (melee)"
+            skillid = "melee"
         elif exit["event"]["type"] == "skillcheck":
-            extended = " (" + exit["event"]["param"] + ")"
+            skillid = exit["event"]["param"]
+            
+        if skillid != "":
+            extended = " (" + getSkill(skillid)["name"] + ")"
         desc += extended
     return desc
+
+def getMob(mobid):
+    global mobs
+    for mob in mobs:
+        if mob["id"] == mobid:
+            return mob
+    return {}
+
+def getSkill(skillid):
+    global player    
+    for skill in player["skills"]:
+        if skill["id"] == skillid:
+            return skill
+    return {}
+
+def getRoomEncounter(room):
+    for exit in room["exits"]:
+        if "type" in exit["event"]:
+            if exit["event"]["type"] == "mobbattle":
+                mob = getMob(exit["event"]["param"])
+                if "desc" in mob:
+                    desc = mob["desc"]
+                    if "onappear" in desc and room["id"] in desc["onappear"]:
+                        return desc["onappear"][room["id"]]
+                    elif "default" in desc:
+                        return desc["default"]
+                    break
+    return ""
 
 def main(argv):
     bookDataFilename = ''
