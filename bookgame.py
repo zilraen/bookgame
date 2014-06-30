@@ -24,7 +24,7 @@ def diceroll(dice):
     while count > 0:
         result += random.randint(1, params["sides"])
         count -= 1
-    result + params["modifier"]
+    result += params["modifier"]
     return result
 
 def getDiceParams(diceString):
