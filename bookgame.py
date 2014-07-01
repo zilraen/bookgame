@@ -28,10 +28,24 @@ def diceroll(dice):
     return result
 
 def getDiceParams(diceString):
-    params = diceString.split("d", 2)
-    amount = int(params[0])
-    sides = int(params[1])
+    amount = 0
+    sides = 0
     modifier = 0
+    
+    params = diceString.split("d", 2)
+    
+    amount = int(params[0])
+    if "+" in params[1]:
+        params = params[1].split("+", 2)
+        sides = int(params[0])
+        modifier = int(params[1])
+    elif "-" in params[1]:
+        params = params[1].split("+", 2)
+        sides = int(params[0])
+        modifier = int(params[1])
+    else:
+        sides = int(params[1])
+        
     result = {"amount": amount, "sides": sides, "modifier": modifier}
     return result
 
