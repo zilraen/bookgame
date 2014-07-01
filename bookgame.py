@@ -32,15 +32,15 @@ def getDiceParams(diceString):
     sides = 0
     modifier = 0
     
-    params = diceString.split("d", 2)
+    params = diceString.split("d")
     
     amount = int(params[0])
     if "+" in params[1]:
-        params = params[1].split("+", 2)
+        params = params[1].split("+")
         sides = int(params[0])
         modifier = int(params[1])
     elif "-" in params[1]:
-        params = params[1].split("+", 2)
+        params = params[1].split("-")
         sides = int(params[0])
         modifier = int(params[1])
     else:
