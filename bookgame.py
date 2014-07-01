@@ -109,10 +109,10 @@ def printRoomDialog(room):
     print "___________"
     print "Possible exits:"
     for idx, exit in enumerate(room["exits"]):
-        print int(idx), ": ", getExitDescription(exit)
+        print int(idx + 1), ": ", getExitDescription(exit)
     exNum = input("Your choise:")
-    if exNum < len(room["exits"]):
-        exit = room["exits"][exNum]
+    if (exNum > 0) and (exNum <= len(room["exits"])):
+        exit = room["exits"][exNum - 1]
         if tryLeaveRoom(exit):
             currentRoomId = exit["id"]
 
@@ -183,7 +183,7 @@ def incSkill(pretender, skillid):
             skill["value"] += 1
             
 def getExitDescription(exit):
-    desc = exit["id"]
+    desc = exit["desc"]
     if exit["event"] != {}:
         extended = ""
         skillid = ""
