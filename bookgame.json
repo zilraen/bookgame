@@ -59,35 +59,38 @@
 "rooms": [
     {
         "id": "forest1",
-        "desc": "You're in forest1.",
+        "desc": "You're at the end of a footpath. A deadfall in front prevents you from moving deeper in the forest",
         "exits":
         [
             {
                 "id": "forest2",
+                "desc": "A little footpath leading back to edge if the wood",
                 "event": {}
             }
         ]
     },
     {
         "id": "forest2",
-        "desc": "You're in forest2.",
+        "desc": "You're standing on edge of the wood.",
         "exits":
         [
             {
                 "id": "forest1",
+                "desc": "A little footpath deeper in forest",
                 "event": {}
             },
             {
                 "id": "mount1",
+                "desc": "A steep stone wall. You could try to climb it to reach a plateau on the top of mount.",
                 "event":
                 {
-                    "text": "You decided to climb the mount1.",
+                    "text": "You decided to climb the mount.",
                     "type": "skillcheck",
                     "param": "climbing",
                     "modifier": 1,
                     "success":
                     {
-                        "text": "You sucessfully climb on the mount1.",
+                        "text": "You sucessfully climb on the mount. You fell much more skillful in climbing now.",
                         "events":
 						[
 							{
@@ -98,7 +101,7 @@
                     },
                     "fail":
                     {
-                        "text": "You fall on a ground.",
+                        "text": "You fall on a ground. That was REALLY painful!",
                         "events":
                         [
                             {
@@ -113,11 +116,12 @@
     },
     {
         "id": "mount1",
-        "desc": "You're in mount1.",
+        "desc": "You're standing at a plateau on the top of mount.",
         "exits":
         [
             {
                 "id": "forest2",
+                "desc": "A way back to wood's edge.",
                 "event":
                 {
                     "type": "mobbattle",
@@ -125,7 +129,7 @@
                     "modifier": 5,
                     "success":
                     {
-                        "text": "You killed the dragon and went down to forest2.",
+                        "text": "You killed the dragon and went down to forest edge.",
                         "events":
                         [
                             {
@@ -147,6 +151,7 @@
             },
             {
                 "id": "forest1",
+                "desc": "A wooded slope. You think the you can use it to went down insensibly. However, you don't know where it leads.",
                 "event":
                 {
                     "text": "You decided to sneak pass the dragon.",

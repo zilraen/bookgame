@@ -28,10 +28,24 @@ def diceroll(dice):
     return result
 
 def getDiceParams(diceString):
-    params = diceString.split("d", 2)
-    amount = int(params[0])
-    sides = int(params[1])
+    amount = 0
+    sides = 0
     modifier = 0
+    
+    params = diceString.split("d")
+    
+    amount = int(params[0])
+    if "+" in params[1]:
+        params = params[1].split("+")
+        sides = int(params[0])
+        modifier = int(params[1])
+    elif "-" in params[1]:
+        params = params[1].split("-")
+        sides = int(params[0])
+        modifier = int(params[1])
+    else:
+        sides = int(params[1])
+        
     result = {"amount": amount, "sides": sides, "modifier": modifier}
     return result
 
@@ -109,10 +123,10 @@ def printRoomDialog(room):
     print "___________"
     print "Possible exits:"
     for idx, exit in enumerate(room["exits"]):
-        print int(idx), ": ", getExitDescription(exit)
+        print int(idx + 1), ": ", getExitDescription(exit)
     exNum = input("Your choise:")
-    if exNum < len(room["exits"]):
-        exit = room["exits"][exNum]
+    if (exNum > 0) and (exNum <= len(room["exits"])):
+        exit = room["exits"][exNum - 1]
         if tryLeaveRoom(exit):
             currentRoomId = exit["id"]
 
@@ -143,6 +157,20 @@ def runEvent(event):
             result = checkSkill(player, event["param"], event["modifier"])
         elif event["type"] == "skillinc":
             incSkill(player, event["param"])
+        elif event["type"] == "mobbattle":
+            mob = getMob(event["param"])
+            if "modifier" in mob:
+                while True:
+                    modifier = mob["modifier"] + event["modifier"]
+                    hit = checkSkill(player, getCombatSkill(), event["modifier"])
+                    if hit:
+                        if tryKill(mob, 1):
+                            result = True
+                            break
+                    if tryKill(player, 1):
+                        result = False
+                        break
+                
             
         logging.debug("Event '%s' result: %s", event["type"], str(result))
     else:
@@ -183,7 +211,7 @@ def incSkill(pretender, skillid):
             skill["value"] += 1
             
 def getExitDescription(exit):
-    desc = exit["id"]
+    desc = exit["desc"]
     if exit["event"] != {}:
         extended = ""
         skillid = ""
@@ -215,6 +243,9 @@ def getSkill(skillid):
         if skill["id"] == skillid:
             return skill
     return {}
+
+def getCombatSkill():
+    return "melee"
 
 def getSkillcheckDifficulty(attemptsAmount):
     global player
