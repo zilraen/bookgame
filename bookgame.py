@@ -157,6 +157,18 @@ def runEvent(event):
             result = checkSkill(player, event["param"], event["modifier"])
         elif event["type"] == "skillinc":
             incSkill(player, event["param"])
+        elif event["type"] == "mobbattle":
+            mob = getMob(event["param"])
+            if "modifier" in mob:
+                while True:
+                    modifier = mob["modifier"] + event["modifier"]
+                    hit = checkSkill(player, getCombatSkill(), event["modifier"])
+                    if hit:
+                        if tryKill(mob, 1):
+                            result = True
+                            break
+                    tryKill(player, 1)
+                
             
         logging.debug("Event '%s' result: %s", event["type"], str(result))
     else:
@@ -229,6 +241,9 @@ def getSkill(skillid):
         if skill["id"] == skillid:
             return skill
     return {}
+
+def getCombatSkill():
+    return "melee"
 
 def getSkillcheckDifficulty(attemptsAmount):
     global player
