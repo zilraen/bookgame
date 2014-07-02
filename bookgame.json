@@ -84,13 +84,13 @@
                 "desc": "A steep stone wall. You could try to climb it to reach a plateau on the top of mount.",
                 "event":
                 {
-                    "text": "You decided to climb the mount1.",
+                    "text": "You decided to climb the mount.",
                     "type": "skillcheck",
                     "param": "climbing",
                     "modifier": 1,
                     "success":
                     {
-                        "text": "You sucessfully climb on the mount1.",
+                        "text": "You sucessfully climb on the mount. You fell much more skillful in climbing now.",
                         "events":
 						[
 							{
@@ -101,7 +101,7 @@
                     },
                     "fail":
                     {
-                        "text": "You fall on a ground.",
+                        "text": "You fall on a ground. That was REALLY painful!",
                         "events":
                         [
                             {
