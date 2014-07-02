@@ -167,7 +167,9 @@ def runEvent(event):
                         if tryKill(mob, 1):
                             result = True
                             break
-                    tryKill(player, 1)
+                    if tryKill(player, 1):
+                        result = False
+                        break
                 
             
         logging.debug("Event '%s' result: %s", event["type"], str(result))
