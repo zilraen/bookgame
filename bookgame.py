@@ -87,6 +87,8 @@ def loadData(bookDataFilename, needLoadSave):
                     if "player" in saveJson:
                         player = json.loads(saveJson["player"])
                         logging.info("player data: %s", str(player))
+                    if "mobs" in saveJson:
+                        mobs["savedinfo"] = json.loads(saveJson["mobs"])
                     fsave.close()
                 except :
                      logging.error("Save file '%s' could not be opened!\n Using default params.", saveFilename)
@@ -98,10 +100,13 @@ def loadData(bookDataFilename, needLoadSave):
 
 def saveGame(bookDataFilename):
     global currentRoomId
+    global player
+    global mobs
     
     savegame = {}       
     savegame["cur_room"] = currentRoomId
     savegame["player"] = player
+    savegame["mobs"] = mobs["savedinfo"]
     
     ssave = json.dumps(savegame)
     logging.debug("SAVED:\n%s\n------------", ssave)
