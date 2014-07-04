@@ -157,7 +157,8 @@ def runEvent(event):
         
     if "type" in event:
         if event["type"] == "damage":
-            tryKill(player, event["param"])
+            if tryKill(player, event["param"]):
+                runEvent({"type": "gameover", "param": "You're dead."})
         elif event["type"] == "skillcheck":
             result = checkSkill(player, event["param"], event["modifier"])
         elif event["type"] == "skillinc":
@@ -174,7 +175,10 @@ def runEvent(event):
                             break
                     if tryKill(player, 1):
                         result = False
+                        runEvent({"type": "gameover", "param": "You're dead."})
                         break
+        elif event["type"] == "gameover":
+            gameOver(event["param"])
                 
             
         logging.debug("Event '%s' result: %s", event["type"], str(result))
@@ -194,6 +198,9 @@ def tryKill(pretender, amount):
         #pretender is dead
         return True
     return False
+
+def gameOver(desc):
+    print desc
 
 def checkSkill(pretender, skillid, mod):
     for skill in pretender["skills"]:
