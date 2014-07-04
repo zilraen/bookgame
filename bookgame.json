@@ -8,6 +8,24 @@
 	"Easy",
 	"Very easy"
 ],
+"gameover":
+{
+	"default":
+	[
+		"Your quest is failed."
+	],
+	"death":
+	[
+		"You're dead.",
+		"You die in middle of nowhere."
+	],
+	"killedByDragon":
+	[
+		"You burn in dragon's flame.",
+		"You're teared by dragon.",
+		"You had been eaten by dragon."
+	]
+},
 "player": 
 {
     "hp": 5,
