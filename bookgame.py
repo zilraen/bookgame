@@ -9,6 +9,7 @@ rooms = {}
 player = {}
 mobs = {}
 difficulty = []
+gameoverTexts = {}
 currentRoomId = ""
 
 debug = False
@@ -66,6 +67,7 @@ def loadData(bookDataFilename, needLoadSave):
                 rooms = bookJson["rooms"]
                 player = bookJson["player"]
                 mobs = bookJson["mobs"]
+                gameoverTexts = bookJson["gameover"]
                 difficulty = bookJson["skillcheckDifficulty"]
                 fbook.close()
                 
@@ -158,7 +160,7 @@ def runEvent(event):
     if "type" in event:
         if event["type"] == "damage":
             if tryKill(player, event["param"]):
-                runEvent({"type": "gameover", "param": "You're dead."})
+                gameover("death")
         elif event["type"] == "skillcheck":
             result = checkSkill(player, event["param"], event["modifier"])
         elif event["type"] == "skillinc":
@@ -175,7 +177,6 @@ def runEvent(event):
                             break
                     if tryKill(player, 1):
                         result = False
-                        runEvent({"type": "gameover", "param": "You're dead."})
                         break
         elif event["type"] == "gameover":
             gameOver(event["param"])
@@ -199,8 +200,20 @@ def tryKill(pretender, amount):
         return True
     return False
 
-def gameOver(desc):
-    print desc
+def gameOver(gameoverId):
+    global gameoverTexts
+    
+    # Default text for case is all texts are unavailable. Should be never used.
+    text = "GAME OVER."
+    if gameoverId not in gameoverTexts:
+        gameoverId = "default"
+        
+    if gameoverId in gameoverTexts:
+        text = random.choice(gameoverTexts[gameoverId])
+    
+    print text
+    sys.exit(1)
+        
 
 def checkSkill(pretender, skillid, mod):
     for skill in pretender["skills"]:
