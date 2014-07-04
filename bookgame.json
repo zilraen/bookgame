@@ -2,12 +2,30 @@
 "entry": "forest2",
 "skillcheckDifficulty":
 [
-	"Impossible",
-	"Hard",
-	"Moderate",
-	"Easy",
-	"Very easy"
+    "Impossible",
+    "Hard",
+    "Moderate",
+    "Easy",
+    "Very easy"
 ],
+"gameover":
+{
+    "default":
+    [
+        "Your quest is failed."
+    ],
+    "death":
+    [
+        "You're dead.",
+        "You die in middle of nowhere."
+    ],
+    "killedByDragon":
+    [
+        "You burn in dragon's flame.",
+        "You're teared by dragon.",
+        "You had been eaten by dragon."
+    ]
+},
 "player": 
 {
     "hp": 5,
@@ -46,11 +64,11 @@
         "name": "Dragon",
         "desc":
         {
-        	"default": "An ancient dragon, dread and terrifying!",
-        	"onappear":
-        	{
-        		"mount1": "When you climbed the mount, you see that a great dragon came out from a cave and lay on a warm stones. Now he didn't see you, but if you attempt to descent, he'll most likely notice you."
-        	}
+            "default": "An ancient dragon, dread and terrifying!",
+            "onappear":
+            {
+                "mount1": "When you climbed the mount, you see that a great dragon came out from a cave and lay on a warm stones. Now he didn't see you, but if you attempt to descent, he'll most likely notice you."
+            }
         },
         "hp": 2,
         "modifier": -5
@@ -92,12 +110,12 @@
                     {
                         "text": "You sucessfully climb on the mount. You fell much more skillful in climbing now.",
                         "events":
-						[
-							{
+                        [
+                            {
                                 "type": "skillinc",
                                 "param": "climbing"
                             }
-						]
+                        ]
                     },
                     "fail":
                     {
@@ -144,8 +162,14 @@
                     },
                     "fail":
                     {
-                        "text": "You retired.",
-                        "events": []
+                        "text": "You lose in battle with dragon.",
+                        "events":
+                        [
+                            {
+                                "type": "gameover",
+                                "param": "killedByDragon"
+                            }
+                        ]
                     }
                 }
             },
@@ -174,7 +198,7 @@
                                 "modifier": 0,
                                 "success":
                                 {
-                                    "text": "You killed the dragon and went down to forest1. During your descent you understood what helped the dragon to notice you.",
+                                    "text": "You killed the dragon. You understood what helped the dragon to notice you and won't made that mistake in future.",
                                     "events":
                                     [
                                         {
@@ -193,8 +217,14 @@
                                 },
                                 "fail":
                                 {
-                                    "text": "You retired.",
-                                    "events": []
+                                    "text": "You lose in battle with dragon.",
+                                    "events":
+                                    [
+                                        {
+                                            "type": "gameover",
+                                            "param": "killedByDragon"
+                                        }
+                                    ]
                                 }
                             }
                         ]

@@ -9,6 +9,7 @@ rooms = {}
 player = {}
 mobs = {}
 difficulty = []
+gameoverTexts = {}
 currentRoomId = ""
 
 debug = False
@@ -66,6 +67,7 @@ def loadData(bookDataFilename, needLoadSave):
                 rooms = bookJson["rooms"]
                 player = bookJson["player"]
                 mobs = bookJson["mobs"]
+                gameoverTexts = bookJson["gameover"]
                 difficulty = bookJson["skillcheckDifficulty"]
                 fbook.close()
                 
@@ -87,6 +89,10 @@ def loadData(bookDataFilename, needLoadSave):
                     if "player" in saveJson:
                         player = json.loads(saveJson["player"])
                         logging.info("player data: %s", str(player))
+                    if "mobs" in saveJson:
+                        mobsSave = json.loads(saveJson["mobs"])
+                        for mobid, mobdata in mobsSave:
+                            mobs[mobid]["savedinfo"] = mobdata
                     fsave.close()
                 except :
                      logging.error("Save file '%s' could not be opened!\n Using default params.", saveFilename)
@@ -98,10 +104,16 @@ def loadData(bookDataFilename, needLoadSave):
 
 def saveGame(bookDataFilename):
     global currentRoomId
+    global player
+    global mobs
     
     savegame = {}       
     savegame["cur_room"] = currentRoomId
     savegame["player"] = player
+    savegame["mobs"] = {}
+    for mob in mobs:
+        if "savedinfo" in mob:
+            savegame["mobs"][mob["id"]] = mob["savedinfo"]
     
     ssave = json.dumps(savegame)
     logging.debug("SAVED:\n%s\n------------", ssave)
@@ -131,17 +143,14 @@ def printRoomDialog(room):
             currentRoomId = exit["id"]
 
 def tryLeaveRoom(exit):
-    if exit["event"] != {}:
-        if runEvent(exit["event"]):
-            runEvent(exit["event"]["success"])
-            return True
-        else:
-            runEvent(exit["event"]["fail"])
-            return False
+    ev = exit["event"]
+    if ev != {}:
+        return runEvent(ev)
     return True
     
 def runEvent(event):
     global player
+    global currentRoomId
     
     result = True
     
@@ -152,14 +161,15 @@ def runEvent(event):
         
     if "type" in event:
         if event["type"] == "damage":
-            tryKill(player, event["param"])
+            if tryKill(player, event["param"]):
+                gameover("death")
         elif event["type"] == "skillcheck":
             result = checkSkill(player, event["param"], event["modifier"])
         elif event["type"] == "skillinc":
             incSkill(player, event["param"])
         elif event["type"] == "mobbattle":
             mob = getMob(event["param"])
-            if "modifier" in mob:
+            if "modifier" in mob and not checkMobSavedInfo(mob, "absent", currentRoomId):
                 while True:
                     modifier = mob["modifier"] + event["modifier"]
                     hit = checkSkill(player, getCombatSkill(), event["modifier"])
@@ -170,6 +180,11 @@ def runEvent(event):
                     if tryKill(player, 1):
                         result = False
                         break
+        elif event["type"] == "mobremove":
+            mobid, location = event["param"].split("@")
+            addMobSavedInfo(getMob(mobid), "absent", location)
+        elif event["type"] == "gameover":
+            gameOver(event["param"])
                 
             
         logging.debug("Event '%s' result: %s", event["type"], str(result))
@@ -181,6 +196,13 @@ def runEvent(event):
             runEvent(subevent)
     else:
         logging.debug("Event '%s' subevents not found!", str(event))
+        
+    if result:
+        if "success" in event:
+            runEvent(event["success"])
+    elif "fail" in event:
+        runEvent(event["fail"])
+    
     return result
 
 def tryKill(pretender, amount):
@@ -189,6 +211,21 @@ def tryKill(pretender, amount):
         #pretender is dead
         return True
     return False
+
+def gameOver(gameoverId):
+    global gameoverTexts
+    
+    # Default text for case is all texts are unavailable. Should be never used.
+    text = "GAME OVER."
+    if gameoverId not in gameoverTexts:
+        gameoverId = "default"
+        
+    if gameoverId in gameoverTexts:
+        text = random.choice(gameoverTexts[gameoverId])
+    
+    print text
+    sys.exit(1)
+        
 
 def checkSkill(pretender, skillid, mod):
     for skill in pretender["skills"]:
@@ -211,14 +248,18 @@ def incSkill(pretender, skillid):
             skill["value"] += 1
             
 def getExitDescription(exit):
+    global currentRoomId
+    
     desc = exit["desc"]
     if exit["event"] != {}:
         extended = ""
         skillid = ""
         mod = 0
         if exit["event"]["type"] == "mobbattle":
-            skillid = "melee"
-            mod = getMob(exit["event"]["param"])["modifier"]
+            mob = getMob(exit["event"]["param"])
+            if not checkMobSavedInfo(mob, "absent", currentRoomId):
+                skillid = getCombatSkill()
+                mod = mob["modifier"]
         elif exit["event"]["type"] == "skillcheck":
             skillid = exit["event"]["param"]
             
@@ -236,6 +277,21 @@ def getMob(mobid):
         if mob["id"] == mobid:
             return mob
     return {}
+
+def addMobSavedInfo(mob, type, data):
+    if "savedinfo" not in mob:
+        mob["savedinfo"] = {}
+    if type not in mob["savedinfo"]:
+        mob["savedinfo"][type] = []
+    mob["savedinfo"][type].append(data)
+    
+def checkMobSavedInfo(mob, type, data):
+    if "savedinfo" not in mob or type not in mob["savedinfo"]:
+        return False
+    elif data in mob["savedinfo"][type]:
+        return True
+    else:
+        return False
 
 def getSkill(skillid):
     global player    
@@ -287,9 +343,11 @@ def getRoomEncounter(room):
         if "type" in exit["event"]:
             if exit["event"]["type"] == "mobbattle":
                 mob = getMob(exit["event"]["param"])
-                if "desc" in mob:
+                if "desc" in mob and not checkMobSavedInfo(mob, "absent", room["id"]):
                     desc = mob["desc"]
-                    if "onappear" in desc and room["id"] in desc["onappear"]:
+                    hasText = "onappear" in desc and room["id"] in desc["onappear"]
+                    if hasText and not checkMobSavedInfo(mob, "appeared", room["id"]):
+                        addMobSavedInfo(mob, "appeared", room["id"])
                         return desc["onappear"][room["id"]]
                     elif "default" in desc:
                         return desc["default"]
