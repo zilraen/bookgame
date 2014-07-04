@@ -162,8 +162,14 @@
                     },
                     "fail":
                     {
-                        "text": "You retired.",
-                        "events": []
+                        "text": "You lose in battle with dragon.",
+                        "events":
+                        [
+                        	{
+                        		"type": "gameover",
+                        		"param": "killedByDragon"
+                        	}
+                        ]
                     }
                 }
             },
@@ -211,8 +217,14 @@
                                 },
                                 "fail":
                                 {
-                                    "text": "You retired.",
-                                    "events": []
+                                    "text": "You lose in battle with dragon.",
+			                        "events":
+			                        [
+			                        	{
+			                        		"type": "gameover",
+			                        		"param": "killedByDragon"
+			                        	}
+			                        ]
                                 }
                             }
                         ]
