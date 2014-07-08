@@ -2,7 +2,6 @@ import json
 import os
 import sys
 import getopt
-import logging
 import random
 
 rooms = {}
@@ -12,7 +11,15 @@ difficulty = []
 gameoverTexts = {}
 currentRoomId = ""
 
-debug = False
+debug = 0
+
+def outputStr(string):
+    print string
+
+def debugOutputStr(string, debugLevel):
+    global debug
+    if (debug >= debugLevel):
+        outputStr(string)
 
 def getSaveFilename(bookDataFilename):
     saveGameFilename = bookDataFilename.split(".")[0] + ".sav"
@@ -57,7 +64,7 @@ def loadData(bookDataFilename, needLoadSave):
     global difficulty
     global currentRoomId
     
-    logging.info("%s opening...", bookDataFilename)
+    debugOutputStr("%s opening..."%(bookDataFilename), 0)
     if os.path.isfile(bookDataFilename):
         with open(bookDataFilename, 'r') as fbook:
             try:
@@ -73,7 +80,7 @@ def loadData(bookDataFilename, needLoadSave):
                 
                 currentRoomId = entry
             except:
-                logging.error("File '%s' could not be opened!", bookDataFilename)
+                debugOutputStr("File '%s' could not be opened!"%(bookDataFilename), 0)
                 sys.exit(2)
 
         saveFilename = getSaveFilename(bookDataFilename)
@@ -81,25 +88,22 @@ def loadData(bookDataFilename, needLoadSave):
             with open(saveFilename, 'r') as fsave:
                 try:
                     s = fsave.read()
-                    logging.info("savedata:\n%s\n loading:", s)
                     saveJson = json.loads(s)
                     if "cur_room" in saveJson:
                         currentRoomId = saveJson["cur_room"]
-                        logging.info("current room id: %s", currentRoomId)
                     if "player" in saveJson:
                         player = json.loads(saveJson["player"])
-                        logging.info("player data: %s", str(player))
                     if "mobs" in saveJson:
                         mobsSave = json.loads(saveJson["mobs"])
                         for mobid, mobdata in mobsSave:
                             mobs[mobid]["savedinfo"] = mobdata
                     fsave.close()
                 except :
-                     logging.error("Save file '%s' could not be opened!\n Using default params.", saveFilename)
+                    debugOutputStr("Save file '%s' could not be opened!\n Using default params."%(saveFilename), 0)
             
         return True
     else:
-        logging.error("Data file '%s' is not exist!", bookDataFilename)
+        debugOutputStr("Data file '%s' is not exist!"%(bookDataFilename), 0)
         return False
 
 def saveGame(bookDataFilename):
@@ -116,7 +120,6 @@ def saveGame(bookDataFilename):
             savegame["mobs"][mob["id"]] = mob["savedinfo"]
     
     ssave = json.dumps(savegame)
-    logging.debug("SAVED:\n%s\n------------", ssave)
     
     saveFilename = getSaveFilename(bookDataFilename)
     fsave = open(saveFilename, "w")
@@ -125,17 +128,17 @@ def saveGame(bookDataFilename):
     
 def printRoomDialog(room):
     global currentRoomId
-    print "________________________"
-    print room["desc"]
+    outputStr("________________________")
+    outputStr(room["desc"])
     
     encounter = getRoomEncounter(room)
     if encounter != "":
-        print encounter
+        outputStr(encounter)
         
-    print "___________"
-    print "Possible exits:"
+    outputStr("___________")
+    outputStr("Possible exits:")
     for idx, exit in enumerate(room["exits"]):
-        print int(idx + 1), ": ", getExitDescription(exit)
+        outputStr("%d: %s"%(int(idx + 1), getExitDescription(exit)))
     exNum = input("Your choise:")
     if (exNum > 0) and (exNum <= len(room["exits"])):
         exit = room["exits"][exNum - 1]
@@ -155,9 +158,9 @@ def runEvent(event):
     result = True
     
     if "text" in event:
-        print event["text"]
+        outputStr(event["text"])
     else:
-        logging.debug("Event '%s' text not found!", str(event))
+        debugOutputStr("Event '%s' text not found!"%(str(event)), 10)
         
     if "type" in event:
         if event["type"] == "damage":
@@ -172,30 +175,33 @@ def runEvent(event):
             if "modifier" in mob and not checkMobSavedInfo(mob, "absent", currentRoomId):
                 while True:
                     modifier = mob["modifier"] + event["modifier"]
-                    hit = checkSkill(player, getCombatSkill(), event["modifier"])
-                    if hit:
+                    hit = checkSkill(player, getCombatSkill(), modifier)
+                    outputStr(getAttackDescription(player, hit))
+                    if hit:                        
                         if tryKill(mob, 1):
                             result = True
                             break
-                    if tryKill(player, 1):
-                        result = False
-                        break
+                    hit = checkSkill(mob, getCombatSkill(), player["modifier"])
+                    outputStr(getAttackDescription(mob, hit))
+                    if hit:
+                        if tryKill(player, 1):
+                            result = False
+                            break
         elif event["type"] == "mobremove":
             mobid, location = event["param"].split("@")
             addMobSavedInfo(getMob(mobid), "absent", location)
         elif event["type"] == "gameover":
             gameOver(event["param"])
-                
             
-        logging.debug("Event '%s' result: %s", event["type"], str(result))
+        debugOutputStr("Event '%s' result: %s"%(event["type"], str(result)), 2)
     else:
-        logging.debug("Event '%s' type not found!", str(event))
+        debugOutputStr("Event '%s' type not found!"%(str(event)), 10)
     
     if "events" in event:
         for subevent in event["events"]:
             runEvent(subevent)
     else:
-        logging.debug("Event '%s' subevents not found!", str(event))
+        debugOutputStr("Event '%s' subevents not found!"%(str(event)), 10)
         
     if result:
         if "success" in event:
@@ -223,7 +229,7 @@ def gameOver(gameoverId):
     if gameoverId in gameoverTexts:
         text = random.choice(gameoverTexts[gameoverId])
     
-    print text
+    outputStr(text)
     sys.exit(1)
         
 
@@ -233,10 +239,10 @@ def checkSkill(pretender, skillid, mod):
             skillbase = skill["value"]
             skillval = skillbase + mod
             valtosuccess = pretender["minValToSuccess"]
-            logging.debug("checkskill: %s, pretenders skill: %d + %d = %d", skillid, skillbase, mod, skillval)
+            debugOutputStr("%s's checkskill: %s, pretenders skill: %d + %d = %d"%(pretender["id"], skillid, skillbase, mod, skillval), 1)
             for i in range(0, skillval):
                 dice = diceroll(pretender["diceToSkillcheck"])
-                logging.debug("dice: %d/%d", dice, valtosuccess)
+                debugOutputStr("dice %s: %d/%d"%(pretender["diceToSkillcheck"], dice, valtosuccess), 1)
                 if dice >= valtosuccess:
                     return True
             break
@@ -354,6 +360,19 @@ def getRoomEncounter(room):
                     break
     return ""
 
+def getAttackDescription(attacker, isSuccess):
+    text = ""
+    if "desc" in attacker:
+        if "onattack" in attacker["desc"]:
+            if isSuccess:
+                id = "hit"
+            else:
+                id = "miss"
+            onattack = attacker["desc"]["onattack"]
+            if id in onattack:
+                text = random.choice(onattack[id])
+    return text
+
 def main(argv):
     global debug
     
@@ -361,19 +380,18 @@ def main(argv):
     needLoadSave = True
     
     try:
-        opts, args = getopt.getopt(argv, "hi:dn", ["ifile=", "debug", "newgame"])
+        opts, args = getopt.getopt(argv, "hi:d:n", ["ifile=", "debug", "newgame"])
     except getopt.GetoptError:
         print 'bookgame.py -i <gamefile> -d'
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print 'bookgame.py -i <gamefile> -d'
+            print 'bookgame.py -i <gamefile> [-d <debuglevel> -n]'
             sys.exit()
         elif opt in ("-i", "--ifile"):
             bookDataFilename = arg
         elif opt in ("-d", "--debug"):
-            logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
-            debug = True
+            debug = int(arg)
         elif opt in ("-n", "--newgame"):
             needLoadSave = False            
     

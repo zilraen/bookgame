@@ -28,9 +28,30 @@
 },
 "player": 
 {
+    "id": "player",
+    "name": "Rim Dragonslayer",
     "hp": 5,
+    "modifier": -2,
     "minValToSuccess": 5,
     "diceToSkillcheck": "1d6",
+    "desc":
+    {
+        "onattack":
+            {
+                "hit":
+                [
+                    "You hit hard with your mace.",
+                    "You bash enemy with your shield.",
+                    "You thrust enemy with your dagger."
+                ],
+                "miss":
+                [
+                    "You swing and miss.",
+                    "You thrust, but enemy's armor protects him.",
+                    "You push with shield but lost your balance. Fortunately enemy lost his balance too."
+                ]
+            }
+    },
     "skills": [
         {
             "id": "sneaking",
@@ -61,17 +82,42 @@
 "mobs": [
     {
         "id": "dragon",
-        "name": "Dragon",
+        "name": "Dragon",       
+        "hp": 2,
+        "modifier": -5,
+        "minValToSuccess": 7,
+        "diceToSkillcheck": "1d8+2",
         "desc":
         {
             "default": "An ancient dragon, dread and terrifying!",
             "onappear":
             {
                 "mount1": "When you climbed the mount, you see that a great dragon came out from a cave and lay on a warm stones. Now he didn't see you, but if you attempt to descent, he'll most likely notice you."
+            },
+            "onattack":
+            {
+                "hit":
+                [
+                    "A dragon's tail swing send you fly.",
+                    "You got burned by a dragon's flame.",
+                    "Dragon grab you with claws and throw on the rocks. It's VERY painful."
+                ],
+                "miss":
+                [
+                    "Dragon's tail whizzed above your head.",
+                    "A dragon's flame melts some rocks near you.",
+                    "Dragon grab a large stone by his claws and throw it away. Fortunately, it wasn't you."
+                ]
             }
         },
-        "hp": 2,
-        "modifier": -5
+        "skills": [
+            {
+                "id": "melee",
+                "name": "Melee",
+                "desc": "Used to battle with somebody in melee.",
+                "value": 3
+            }
+        ]
     }
 ],
 "rooms": [
