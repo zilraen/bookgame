@@ -14,6 +14,14 @@ currentRoomId = ""
 
 debug = False
 
+def outputStr(string):
+    print string
+
+def debugOutputStr(string):
+    global debug
+    if debug:
+        outputStr(string)
+
 def getSaveFilename(bookDataFilename):
     saveGameFilename = bookDataFilename.split(".")[0] + ".sav"
     return saveGameFilename
