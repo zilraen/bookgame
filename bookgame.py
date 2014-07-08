@@ -175,14 +175,17 @@ def runEvent(event):
             if "modifier" in mob and not checkMobSavedInfo(mob, "absent", currentRoomId):
                 while True:
                     modifier = mob["modifier"] + event["modifier"]
-                    hit = checkSkill(player, getCombatSkill(), event["modifier"])
-                    if hit:
+                    hit = checkSkill(player, getCombatSkill(), modifier)
+                    outputStr(getAttackDescription(player, hit))
+                    if hit:                        
                         if tryKill(mob, 1):
                             result = True
                             break
-                    if tryKill(player, 1):
-                        result = False
-                        break
+                    hit = checkSkill(mob, getCombatSkill(), player["modifier"])
+                    if hit:
+                        if tryKill(player, 1):
+                            result = False
+                            break
         elif event["type"] == "mobremove":
             mobid, location = event["param"].split("@")
             addMobSavedInfo(getMob(mobid), "absent", location)
@@ -235,7 +238,7 @@ def checkSkill(pretender, skillid, mod):
             skillbase = skill["value"]
             skillval = skillbase + mod
             valtosuccess = pretender["minValToSuccess"]
-            debugOutputStr("checkskill: %s, pretenders skill: %d + %d = %d"%(skillid, skillbase, mod, skillval), 1)
+            debugOutputStr("%s's checkskill: %s, pretenders skill: %d + %d = %d"%(pretender["id"], skillid, skillbase, mod, skillval), 1)
             for i in range(0, skillval):
                 dice = diceroll(pretender["diceToSkillcheck"])
                 debugOutputStr("dice %s: %d/%d"%(pretender["diceToSkillcheck"], dice, valtosuccess), 1)
@@ -355,6 +358,19 @@ def getRoomEncounter(room):
                         return desc["default"]
                     break
     return ""
+
+def getAttackDescription(attacker, isSuccess):
+    text = ""
+    if "desc" in attacker:
+        if "onattack" in attacker["desc"]:
+            if isSuccess:
+                id = "hit"
+            else:
+                id = "miss"
+            onattack = attacker["desc"]["onattack"]
+            if id in onattack:
+                text = random.choice(onattack["id"])
+    return text
 
 def main(argv):
     global debug
