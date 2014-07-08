@@ -182,6 +182,7 @@ def runEvent(event):
                             result = True
                             break
                     hit = checkSkill(mob, getCombatSkill(), player["modifier"])
+                    outputStr(getAttackDescription(mob, hit))
                     if hit:
                         if tryKill(player, 1):
                             result = False
@@ -369,7 +370,7 @@ def getAttackDescription(attacker, isSuccess):
                 id = "miss"
             onattack = attacker["desc"]["onattack"]
             if id in onattack:
-                text = random.choice(onattack["id"])
+                text = random.choice(onattack[id])
     return text
 
 def main(argv):

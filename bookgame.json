@@ -31,7 +31,7 @@
     "id": "player",
     "name": "Rim Dragonslayer",
     "hp": 5,
-    "modifier": -5,
+    "modifier": -2,
     "minValToSuccess": 5,
     "diceToSkillcheck": "1d6",
     "desc":
@@ -82,7 +82,11 @@
 "mobs": [
     {
         "id": "dragon",
-        "name": "Dragon",
+        "name": "Dragon",       
+        "hp": 2,
+        "modifier": -5,
+        "minValToSuccess": 7,
+        "diceToSkillcheck": "1d8+2",
         "desc":
         {
             "default": "An ancient dragon, dread and terrifying!",
@@ -106,15 +110,13 @@
                 ]
             }
         },
-        "hp": 2,
-        "modifier": -5,
         "skills": [
             {
                 "id": "melee",
                 "name": "Melee",
                 "desc": "Used to battle with somebody in melee.",
                 "value": 3
-            },
+            }
         ]
     }
 ],
