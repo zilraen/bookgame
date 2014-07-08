@@ -11,14 +11,14 @@ difficulty = []
 gameoverTexts = {}
 currentRoomId = ""
 
-debug = False
+debug = 0
 
 def outputStr(string):
     print string
 
-def debugOutputStr(string):
+def debugOutputStr(string, debugLevel):
     global debug
-    if debug:
+    if (debug >= debugLevel):
         outputStr(string)
 
 def getSaveFilename(bookDataFilename):
@@ -64,7 +64,7 @@ def loadData(bookDataFilename, needLoadSave):
     global difficulty
     global currentRoomId
     
-    debugOutputStr("%s opening..."%(bookDataFilename))
+    debugOutputStr("%s opening..."%(bookDataFilename), 0)
     if os.path.isfile(bookDataFilename):
         with open(bookDataFilename, 'r') as fbook:
             try:
@@ -80,7 +80,7 @@ def loadData(bookDataFilename, needLoadSave):
                 
                 currentRoomId = entry
             except:
-                debugOutputStr("File '%s' could not be opened!"%(bookDataFilename))
+                debugOutputStr("File '%s' could not be opened!"%(bookDataFilename), 0)
                 sys.exit(2)
 
         saveFilename = getSaveFilename(bookDataFilename)
@@ -99,11 +99,11 @@ def loadData(bookDataFilename, needLoadSave):
                             mobs[mobid]["savedinfo"] = mobdata
                     fsave.close()
                 except :
-                    debugOutputStr("Save file '%s' could not be opened!\n Using default params."%(saveFilename))
+                    debugOutputStr("Save file '%s' could not be opened!\n Using default params."%(saveFilename), 0)
             
         return True
     else:
-        debugOutputStr("Data file '%s' is not exist!"%(bookDataFilename))
+        debugOutputStr("Data file '%s' is not exist!"%(bookDataFilename), 0)
         return False
 
 def saveGame(bookDataFilename):
@@ -160,7 +160,7 @@ def runEvent(event):
     if "text" in event:
         outputStr(event["text"])
     else:
-        debugOutputStr("Event '%s' text not found!"%(str(event)))
+        debugOutputStr("Event '%s' text not found!"%(str(event)), 10)
         
     if "type" in event:
         if event["type"] == "damage":
@@ -189,15 +189,15 @@ def runEvent(event):
         elif event["type"] == "gameover":
             gameOver(event["param"])
             
-        debugOutputStr("Event '%s' result: %s"%(event["type"], str(result)))
+        debugOutputStr("Event '%s' result: %s"%(event["type"], str(result)), 2)
     else:
-        debugOutputStr("Event '%s' type not found!"%(str(event)))
+        debugOutputStr("Event '%s' type not found!"%(str(event)), 10)
     
     if "events" in event:
         for subevent in event["events"]:
             runEvent(subevent)
     else:
-        debugOutputStr("Event '%s' subevents not found!"%(str(event)))
+        debugOutputStr("Event '%s' subevents not found!"%(str(event)), 10)
         
     if result:
         if "success" in event:
@@ -235,10 +235,10 @@ def checkSkill(pretender, skillid, mod):
             skillbase = skill["value"]
             skillval = skillbase + mod
             valtosuccess = pretender["minValToSuccess"]
-            debugOutputStr("checkskill: %s, pretenders skill: %d + %d = %d"%(skillid, skillbase, mod, skillval))
+            debugOutputStr("checkskill: %s, pretenders skill: %d + %d = %d"%(skillid, skillbase, mod, skillval), 1)
             for i in range(0, skillval):
                 dice = diceroll(pretender["diceToSkillcheck"])
-                debugOutputStr("dice: %d/%d"%(dice, valtosuccess))
+                debugOutputStr("dice %s: %d/%d"%(pretender["diceToSkillcheck"], dice, valtosuccess), 1)
                 if dice >= valtosuccess:
                     return True
             break
@@ -363,18 +363,18 @@ def main(argv):
     needLoadSave = True
     
     try:
-        opts, args = getopt.getopt(argv, "hi:dn", ["ifile=", "debug", "newgame"])
+        opts, args = getopt.getopt(argv, "hi:d:n", ["ifile=", "debug", "newgame"])
     except getopt.GetoptError:
         print 'bookgame.py -i <gamefile> -d'
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print 'bookgame.py -i <gamefile> -d'
+            print 'bookgame.py -i <gamefile> [-d <debuglevel> -n]'
             sys.exit()
         elif opt in ("-i", "--ifile"):
             bookDataFilename = arg
         elif opt in ("-d", "--debug"):
-            debug = True
+            debug = int(arg)
         elif opt in ("-n", "--newgame"):
             needLoadSave = False            
     
