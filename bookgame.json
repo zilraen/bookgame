@@ -8,6 +8,13 @@
     "Easy",
     "Very easy"
 ],
+"inputRequest":
+[
+    "Thy choise? ",
+    "Thy actions? ",
+    "Myl'rd?"
+],
+
 "gameover":
 {
     "default":
