@@ -9,6 +9,7 @@ player = {}
 mobs = {}
 difficulty = []
 inputRequest = []
+availableExits = []
 gameoverTexts = {}
 currentRoomId = ""
 
@@ -78,6 +79,7 @@ def loadData(bookDataFilename, needLoadSave):
                 gameoverTexts = bookJson["gameover"]
                 difficulty = bookJson["skillcheckDifficulty"]
                 inputRequest = bookJson["inputRequest"]
+                availableExits = bookJson["availableExits"]
                 fbook.close()
                 
                 currentRoomId = entry
@@ -138,7 +140,7 @@ def printRoomDialog(room):
         outputStr(encounter)
         
     outputStr("___________")
-    outputStr("Possible exits:")
+    outputStr(getAvailableExits())
     for idx, exit in enumerate(room["exits"]):
         outputStr("%d: %s"%(int(idx + 1), getExitDescription(exit)))
     exNum = input(getInputRequest())
@@ -377,9 +379,12 @@ def getAttackDescription(attacker, isSuccess):
     
 def getInputRequest():
     global inputRequest
-    
     result = random.choice(inputRequest)
-        
+    return result
+
+def getAvailableExits():
+    global availableExits
+    result = random.choice(availableExits)
     return result
 
 def main(argv):
