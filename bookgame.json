@@ -14,7 +14,12 @@
     "Thy actions? ",
     "Myl'rd?"
 ],
-
+"availableExits":
+[
+    "Possible exits: ",
+    "You can go: ",
+    "Places to go: "
+],
 "gameover":
 {
     "default":
