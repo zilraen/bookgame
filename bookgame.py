@@ -4,9 +4,10 @@ import sys
 import getopt
 import random
 
-rooms = {}
+rooms = []
 player = {}
-mobs = {}
+mobs = []
+skills = []
 difficulty = []
 inputRequest = []
 availableExits = []
@@ -69,7 +70,10 @@ def loadData(bookDataFilename, needLoadSave):
     global rooms
     global player
     global mobs
+    global skills
     global difficulty
+    global inputRequest
+    global availableExits
     global currentRoomId
     
     debugOutputStr("%s opening..."%(bookDataFilename), 0)
@@ -82,6 +86,7 @@ def loadData(bookDataFilename, needLoadSave):
                 rooms = bookJson["rooms"]
                 player = bookJson["player"]
                 mobs = bookJson["mobs"]
+                skills = bookJson["skills"]
                 gameoverTexts = bookJson["gameover"]
                 difficulty = bookJson["skillcheckDifficulty"]
                 inputRequest = bookJson["inputRequest"]
@@ -151,21 +156,26 @@ def printRoomDialog(room):
     outputStr(getAvailableExits())
     for idx, exit in enumerate(room["exits"]):
         outputStr("%d: %s"%(int(idx + 1), getExitDescription(exit)))
-    exNum = input(getInputRequest())
-    if exNum in ("skills", "skill", "s"):
+    userInput = raw_input(getInputRequest())
+    if userInput in ("skills", "skill", "s"):
         printSkills(player)
-    if (exNum > 0) and (exNum <= len(room["exits"])):
-        exit = room["exits"][exNum - 1]
-        if tryLeaveRoom(exit):
-            currentRoomId = exit["id"]
+    else:
+        try:
+            exNum = int(userInput)
+            if(exNum > 0) and (exNum <= len(room["exits"])):
+                exit = room["exits"][exNum - 1]
+                if tryLeaveRoom(exit):
+                    currentRoomId = exit["id"]
+        except ValueError:
+            return
 
 def printSkills(mob):
     if "skills" in mob:
-        for skill in mob["skills"]:
-            outputStr("%s [%+d]:"%(skill["name"], skill["value"]))
+        for skillid in mob["skills"].keys():
+            skillval = mob["skills"][skillid]
+            skillDef = getSkill(skillid)
             outputShortLine()
-            outputStr(skill["desc"])
-            outputLine()
+            outputStr("%s [%+d]:\n%s"%(skillDef["name"], skillval, skillDef["desc"]))
 
 def tryLeaveRoom(exit):
     ev = exit["event"]
@@ -197,13 +207,13 @@ def runEvent(event):
             if "modifier" in mob and not checkMobSavedInfo(mob, "absent", currentRoomId):
                 while True:
                     modifier = mob["modifier"] + event["modifier"]
-                    hit = checkSkill(player, getCombatSkill(), modifier)
+                    hit = checkSkill(player, getCombatSkillId(), modifier)
                     outputStr(getAttackDescription(player, hit))
                     if hit:                        
                         if tryKill(mob, 1):
                             result = True
                             break
-                    hit = checkSkill(mob, getCombatSkill(), player["modifier"])
+                    hit = checkSkill(mob, getCombatSkillId(), player["modifier"])
                     outputStr(getAttackDescription(mob, hit))
                     if hit:
                         if tryKill(player, 1):
@@ -256,24 +266,27 @@ def gameOver(gameoverId):
         
 
 def checkSkill(pretender, skillid, mod):
-    for skill in pretender["skills"]:
-        if skill["id"] == skillid:
-            skillbase = skill["value"]
-            skillval = skillbase + mod
-            valtosuccess = pretender["minValToSuccess"]
-            debugOutputStr("%s's checkskill: %s, pretenders skill: %d %+d = %d"%(pretender["id"], skillid, skillbase, mod, skillval), 1)
-            for i in range(0, skillval):
-                dice = diceroll(pretender["diceToSkillcheck"])
-                debugOutputStr("dice %s: %d/%d"%(pretender["diceToSkillcheck"], dice, valtosuccess), 1)
-                if dice >= valtosuccess:
-                    return True
+    skillbase = 0
+    if skillid in pretender["skills"]:
+        skillbase = pretender["skills"][skillid]
+        
+    skillval = skillbase + mod
+    valtosuccess = pretender["minValToSuccess"]
+    debugOutputStr("%s's checkskill: %s, pretenders skill: %d %+d = %d"%(pretender["id"], skillid, skillbase, mod, skillval), 1)
+    for i in range(0, skillval):
+        dice = diceroll(pretender["diceToSkillcheck"])
+        debugOutputStr("dice %s: %d/%d"%(pretender["diceToSkillcheck"], dice, valtosuccess), 1)
+        if dice >= valtosuccess:
+            return True
             break
+            
     return False
 
 def incSkill(pretender, skillid):
-    for skill in pretender["skills"]:
-        if skill["id"] == skillid:
-            skill["value"] += 1
+    if skillid in pretender["skills"]:
+        pretender["skills"][skillid] += 1
+    else:
+        pretender["skills"][skillid] = 1
             
 def getExitDescription(exit):
     global currentRoomId
@@ -286,16 +299,19 @@ def getExitDescription(exit):
         if exit["event"]["type"] == "mobbattle":
             mob = getMob(exit["event"]["param"])
             if not checkMobSavedInfo(mob, "absent", currentRoomId):
-                skillid = getCombatSkill()
+                skillid = getCombatSkillId()
                 mod = mob["modifier"]
         elif exit["event"]["type"] == "skillcheck":
             skillid = exit["event"]["param"]
             
         if skillid != "":
             mod += exit["event"]["modifier"]
+            if skillid in player["skills"]:
+                mod += player["skills"][skillid]
+                
             skill = getSkill(skillid)
-            mod += skill["value"]
-            extended = " (" + skill["name"] + ": " + getSkillcheckDifficulty(mod) + ")"
+            if "name" in skill:
+                extended = " (" + skill["name"] + ": " + getSkillcheckDifficulty(mod) + ")"
         desc += extended
     return desc
 
@@ -322,13 +338,13 @@ def checkMobSavedInfo(mob, type, data):
         return False
 
 def getSkill(skillid):
-    global player    
-    for skill in player["skills"]:
+    global skills
+    for skill in skills:
         if skill["id"] == skillid:
             return skill
     return {}
-
-def getCombatSkill():
+    
+def getCombatSkillId():
     return "melee"
 
 def getSkillcheckDifficulty(attemptsAmount):

@@ -12,7 +12,7 @@
 [
     "Thy choise? ",
     "Thy actions? ",
-    "Myl'rd?"
+    "Myl'rd? "
 ],
 "availableExits":
 [
@@ -38,6 +38,29 @@
         "You had been eaten by dragon."
     ]
 },
+"skills":
+[
+    {
+        "id": "sneaking",
+        "name": "Sneaking",
+        "desc": "Used to sneak somewhere."
+    },
+    {
+        "id": "climbing",
+        "name": "Climbing",
+        "desc": "Used to climb somewhere."
+    },
+    {
+        "id": "melee",
+        "name": "Melee",
+        "desc": "Used to battle with somebody in melee."
+    },
+    {
+        "id": "dancing",
+        "name": "Dancing",
+        "desc": "Used to dance. Not used yet, added as an example of skill that is require unlock."
+    }
+],
 "player": 
 {
     "id": "player",
@@ -64,34 +87,15 @@
                 ]
             }
     },
-    "skills": [
-        {
-            "id": "sneaking",
-            "name": "Sneaking",
-            "desc": "Used to sneak somewhere.",
-            "value": 3
-        },
-        {
-            "id": "climbing",
-            "name": "Climbing",
-            "desc": "Used to climb somewhere.",
-            "value": 3
-        },
-        {
-            "id": "melee",
-            "name": "Melee",
-            "desc": "Used to battle with somebody in melee.",
-            "value": 3
-        },
-        {
-            "id": "dancing",
-            "name": "Dancing",
-            "desc": "Used to dance. Not used yet, added as an example of skill that is require unlock.",
-            "value": 0
-        }
-    ]
+    "skills":
+    {
+        "sneaking": 3,
+        "climbing": 3,
+        "melee": 3
+    }
 },
-"mobs": [
+"mobs":
+[
     {
         "id": "dragon",
         "name": "Dragon",       
@@ -122,17 +126,14 @@
                 ]
             }
         },
-        "skills": [
-            {
-                "id": "melee",
-                "name": "Melee",
-                "desc": "Used to battle with somebody in melee.",
-                "value": 3
-            }
-        ]
+        "skills": 
+        {
+            "melee": 3
+        }
     }
 ],
-"rooms": [
+"rooms":
+[
     {
         "id": "forest1",
         "desc": "You're at the end of a footpath. A deadfall in front prevents you from moving deeper in the forest",
