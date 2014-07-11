@@ -52,41 +52,41 @@
             {
                 "hit":
                 [
-                    "You hit hard with your mace.",
-                    "You bash enemy with your shield.",
-                    "You thrust enemy with your dagger."
+                    "Вы с силой бьете булавой.",
+                    "Вы ударяете противника щитом.",
+                    "Вы колете противника кинжалом."
                 ],
                 "miss":
                 [
-                    "You swing and miss.",
-                    "You thrust, but enemy's armor protects him.",
-                    "You push with shield but lost your balance. Fortunately enemy lost his balance too."
+                    "Вы бьете и промахиваетесь",
+                    "Броня противнкиа отводит ваш укол.",
+                    "Вы толкаете противника щитом, не теряете равновесие. К счастью, противник - тоже."
                 ]
             }
     },
     "skills": [
         {
             "id": "sneaking",
-            "name": "Sneaking",
-            "desc": "Used to sneak somewhere.",
+            "name": "Незаметность",
+            "desc": "Используется, чтобы прокрасться куда-либо.",
             "value": 3
         },
         {
             "id": "climbing",
-            "name": "Climbing",
-            "desc": "Used to climb somewhere.",
+            "name": "Лазание",
+            "desc": "Используется, чтобы куда-либо вскарабкаться.",
             "value": 3
         },
         {
             "id": "melee",
-            "name": "Melee",
-            "desc": "Used to battle with somebody in melee.",
+            "name": "Рукопашный бой",
+            "desc": "Используется для сражения в рукопашной.",
             "value": 3
         },
         {
             "id": "dancing",
-            "name": "Dancing",
-            "desc": "Used to dance. Not used yet, added as an example of skill that is require unlock.",
+            "name": "Танцы",
+            "desc": "Испольуется для танцев. Пример скилла, которому нужна разблокировка.",
             "value": 0
         }
     ]
@@ -94,7 +94,7 @@
 "mobs": [
     {
         "id": "dragon",
-        "name": "Dragon",       
+        "name": "Дракон",       
         "hp": 2,
         "modifier": -5,
         "minValToSuccess": 7,
