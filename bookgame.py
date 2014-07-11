@@ -23,6 +23,12 @@ def debugOutputStr(string, debugLevel):
     if (debug >= debugLevel):
         outputStr(string)
 
+def outputLine():
+    outputStr("________________________")
+
+def outputShortLine():
+    outputStr("___________")
+
 def getSaveFilename(bookDataFilename):
     saveGameFilename = bookDataFilename.split(".")[0] + ".sav"
     return saveGameFilename
@@ -132,22 +138,34 @@ def saveGame(bookDataFilename):
     
 def printRoomDialog(room):
     global currentRoomId
-    outputStr("________________________")
+    global player
+    
+    outputLine()
     outputStr(room["desc"])
     
     encounter = getRoomEncounter(room)
     if encounter != "":
         outputStr(encounter)
         
-    outputStr("___________")
+    outputShortLine()
     outputStr(getAvailableExits())
     for idx, exit in enumerate(room["exits"]):
         outputStr("%d: %s"%(int(idx + 1), getExitDescription(exit)))
     exNum = input(getInputRequest())
+    if exNum in ("skills", "skill", "s"):
+        printSkills(player)
     if (exNum > 0) and (exNum <= len(room["exits"])):
         exit = room["exits"][exNum - 1]
         if tryLeaveRoom(exit):
             currentRoomId = exit["id"]
+
+def printSkills(mob):
+    if "skills" in mob:
+        for skill in mob["skills"]:
+            outputStr("%s [%+d]:"%(skill["name"], skill["value"]))
+            outputShortLine()
+            outputStr(skill["desc"])
+            outputLine()
 
 def tryLeaveRoom(exit):
     ev = exit["event"]
@@ -243,7 +261,7 @@ def checkSkill(pretender, skillid, mod):
             skillbase = skill["value"]
             skillval = skillbase + mod
             valtosuccess = pretender["minValToSuccess"]
-            debugOutputStr("%s's checkskill: %s, pretenders skill: %d + %d = %d"%(pretender["id"], skillid, skillbase, mod, skillval), 1)
+            debugOutputStr("%s's checkskill: %s, pretenders skill: %d %+d = %d"%(pretender["id"], skillid, skillbase, mod, skillval), 1)
             for i in range(0, skillval):
                 dice = diceroll(pretender["diceToSkillcheck"])
                 debugOutputStr("dice %s: %d/%d"%(pretender["diceToSkillcheck"], dice, valtosuccess), 1)
