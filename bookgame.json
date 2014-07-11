@@ -64,7 +64,13 @@
 "player": 
 {
     "id": "player",
-    "name": "Rim Dragonslayer",
+    "name":
+    [
+        "Rim the Dragonslayer",
+        "Rim",
+        "the Dragonslayer",
+        "You"
+    ]
     "hp": 5,
     "modifier": -2,
     "minValToSuccess": 5,
@@ -98,7 +104,12 @@
 [
     {
         "id": "dragon",
-        "name": "Dragon",       
+        "name":
+        [
+            "Dragon",
+            "The Greatest",
+            "The Ancient One"
+        ]
         "hp": 2,
         "modifier": -5,
         "minValToSuccess": 7,

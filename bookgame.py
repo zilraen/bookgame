@@ -451,4 +451,5 @@ def main(argv):
                     saveGame(bookDataFilename)
         
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    #main(sys.argv[1:])
+    main(["-i", "bookgame.json", "-d", "2", "-n"])
