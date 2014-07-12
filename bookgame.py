@@ -8,6 +8,7 @@ rooms = []
 player = {}
 mobs = []
 skills = []
+items = []
 difficulty = []
 inputRequest = []
 availableExits = []
@@ -66,11 +67,12 @@ def getDiceParams(diceString):
     result = {"amount": amount, "sides": sides, "modifier": modifier}
     return result
 
-def loadData(bookDataFilename, needLoadSave):        
+def loadData(bookDataFilename, needLoadSave):
     global rooms
     global player
     global mobs
     global skills
+    global items
     global difficulty
     global inputRequest
     global availableExits
@@ -87,6 +89,7 @@ def loadData(bookDataFilename, needLoadSave):
                 player = bookJson["player"]
                 mobs = bookJson["mobs"]
                 skills = bookJson["skills"]
+                items = bookJson["items"]
                 gameoverTexts = bookJson["gameover"]
                 difficulty = bookJson["skillcheckDifficulty"]
                 inputRequest = bookJson["inputRequest"]
@@ -159,6 +162,8 @@ def printRoomDialog(room):
     userInput = raw_input(getInputRequest())
     if userInput in ("skills", "skill", "s"):
         printSkills(player)
+    elif userInput in ("items", "item", "i"):
+        printItems(player)
     else:
         try:
             exNum = int(userInput)
@@ -176,6 +181,17 @@ def printSkills(mob):
             skillDef = getSkill(skillid)
             outputShortLine()
             outputStr("%s [%+d]:\n%s"%(skillDef["name"], skillval, skillDef["desc"]))
+
+def printItems(mob):
+    if "items" in mob:
+        for itemid in mob["items"].keys():
+            outputShortLine()
+            itemDef = getItem(itemid)
+            outputStr("%s:\n%s"%(itemDef["name"], itemDef["desc"]))
+            for skillid in itemDef["type"].keys():
+                skill = getSkill(skillid)
+                modifier = itemDef["type"][skillid]["modifier"]
+                outputStr("%s: [%+d]"%(skill["name"], modifier))
 
 def tryLeaveRoom(exit):
     ev = exit["event"]
@@ -266,13 +282,11 @@ def gameOver(gameoverId):
         
 
 def checkSkill(pretender, skillid, mod):
-    skillbase = 0
-    if skillid in pretender["skills"]:
-        skillbase = pretender["skills"][skillid]
-        
-    skillval = skillbase + mod
+    skillval = getSkillWithMods(pretender, skillid, mod)
     valtosuccess = pretender["minValToSuccess"]
-    debugOutputStr("%s's checkskill: %s, pretenders skill: %d %+d = %d"%(pretender["id"], skillid, skillbase, mod, skillval), 1)
+    
+    outputStr(getItemUseDescription(pretender, skillid))
+    debugOutputStr("%s's checkskill: %s, pretenders effective skill: %d"%(pretender["id"], skillid, skillval), 1)
     for i in range(0, skillval):
         dice = diceroll(pretender["diceToSkillcheck"])
         debugOutputStr("dice %s: %d/%d"%(pretender["diceToSkillcheck"], dice, valtosuccess), 1)
@@ -306,12 +320,13 @@ def getExitDescription(exit):
             
         if skillid != "":
             mod += exit["event"]["modifier"]
-            if skillid in player["skills"]:
-                mod += player["skills"][skillid]
+            
+            skillval = getSkillWithMods(player, skillid, mod)
                 
             skill = getSkill(skillid)
             if "name" in skill:
-                extended = " (" + skill["name"] + ": " + getSkillcheckDifficulty(mod) + ")"
+                extended = " (" + skill["name"] + ": " + getSkillcheckDifficulty(skillval) + ")"
+                
         desc += extended
     return desc
 
@@ -343,6 +358,38 @@ def getSkill(skillid):
         if skill["id"] == skillid:
             return skill
     return {}
+
+def getItem(itemid):
+    global items
+    for item in items:
+        if item["id"] == itemid:
+            return item
+    return {}
+
+def getAffectingItems(mob, skillid):
+    global items
+    affectingItems = []
+    if "items" in mob:
+        for itemid in mob["items"].keys():
+            for item in items:
+                if item["id"] == itemid:
+                    if skillid in item["type"]:
+                        affectingItems.append(item)
+    return affectingItems
+
+def getSkillWithMods(pretender, skillid, mod):
+    skillbase = 0
+    if skillid in pretender["skills"]:
+        skillbase = pretender["skills"][skillid]
+        
+    affectingItems = getAffectingItems(pretender, skillid)
+    itemsBonus = 0
+    if len(affectingItems):
+        for item in affectingItems:
+            itemsBonus += item["type"][skillid]["modifier"]
+        
+    skillval = skillbase + mod + itemsBonus
+    return skillval
     
 def getCombatSkillId():
     return "melee"
@@ -352,7 +399,7 @@ def getSkillcheckDifficulty(attemptsAmount):
     global difficulty
     global debug
     
-    dice = player["diceToSkillcheck"]    
+    dice = player["diceToSkillcheck"]
     minval = player["minValToSuccess"]
     params = getDiceParams(dice)
     dicemin = params["amount"] + params["modifier"]
@@ -410,6 +457,15 @@ def getAttackDescription(attacker, isSuccess):
             if id in onattack:
                 text = random.choice(onattack[id])
     return text
+
+def getItemUseDescription(pretender, skillid):
+    text = ""
+    items = getAffectingItems(pretender, skillid)
+    if len(items):
+        item = random.choice(items)
+        text = random.choice(item["type"][skillid]["use"])
+        text = text.format(getName(pretender))
+    return text
     
 def getInputRequest():
     global inputRequest
@@ -419,6 +475,10 @@ def getInputRequest():
 def getAvailableExits():
     global availableExits
     result = random.choice(availableExits)
+    return result
+    
+def getName(mob):
+    result = random.choice(mob["name"])
     return result
 
 def main(argv):
@@ -441,7 +501,7 @@ def main(argv):
         elif opt in ("-d", "--debug"):
             debug = int(arg)
         elif opt in ("-n", "--newgame"):
-            needLoadSave = False            
+            needLoadSave = False
     
     if loadData(bookDataFilename, needLoadSave):
         while True:

@@ -61,6 +61,49 @@
         "desc": "Used to dance. Not used yet, added as an example of skill that is require unlock."
     }
 ],
+"items":
+[
+    {
+        "id": "mace",
+        "type":
+        {
+            "melee": 
+            {
+                "modifier": 2,
+                "use":
+                [
+                    "{0} hit hard with heavy mace."
+                ]
+            }
+        },
+        "name": "Iron Mace",
+        "desc": "Rusty iron mace."
+    },
+    {
+        "id": "dagger",
+        "type": 
+        {
+            "melee": 
+            {
+                "modifier": 1,
+                "use":
+                [
+                    "{0} thrusts with dagger on the sly."
+                ]
+            },
+            "climbing": 
+            {
+                "modifier": 1,
+                "use":
+                [
+                    "{0} climbs using a dagger as a fulcrum."
+                ]
+            }
+        },
+        "name": "Short dagger",
+        "desc": "Worn but still sharp blade.  5 inch long."
+    }
+],
 "player": 
 {
     "id": "player",
@@ -70,7 +113,7 @@
         "Rim",
         "the Dragonslayer",
         "You"
-    ]
+    ],
     "hp": 5,
     "modifier": -2,
     "minValToSuccess": 5,
@@ -98,6 +141,10 @@
         "sneaking": 3,
         "climbing": 3,
         "melee": 3
+    },
+    "items":
+    {
+        "dagger": 1
     }
 },
 "mobs":
@@ -109,7 +156,7 @@
             "Dragon",
             "The Greatest",
             "The Ancient One"
-        ]
+        ],
         "hp": 2,
         "modifier": -5,
         "minValToSuccess": 7,
