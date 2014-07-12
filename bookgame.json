@@ -8,6 +8,18 @@
     "Easy",
     "Very easy"
 ],
+"inputRequest":
+[
+    "Thy choise? ",
+    "Thy actions? ",
+    "Myl'rd? "
+],
+"availableExits":
+[
+    "Possible exits: ",
+    "You can go: ",
+    "Places to go: "
+],
 "gameover":
 {
     "default":
@@ -26,10 +38,82 @@
         "You had been eaten by dragon."
     ]
 },
+"skills":
+[
+    {
+        "id": "sneaking",
+        "name": "Sneaking",
+        "desc": "Used to sneak somewhere."
+    },
+    {
+        "id": "climbing",
+        "name": "Climbing",
+        "desc": "Used to climb somewhere."
+    },
+    {
+        "id": "melee",
+        "name": "Melee",
+        "desc": "Used to battle with somebody in melee."
+    },
+    {
+        "id": "dancing",
+        "name": "Dancing",
+        "desc": "Used to dance. Not used yet, added as an example of skill that is require unlock."
+    }
+],
+"items":
+[
+    {
+        "id": "mace",
+        "type":
+        {
+            "melee": 
+            {
+                "modifier": 2,
+                "use":
+                [
+                    "{0} hit hard with heavy mace."
+                ]
+            }
+        },
+        "name": "Iron Mace",
+        "desc": "Rusty iron mace."
+    },
+    {
+        "id": "dagger",
+        "type": 
+        {
+            "melee": 
+            {
+                "modifier": 1,
+                "use":
+                [
+                    "{0} thrusts with dagger on the sly."
+                ]
+            },
+            "climbing": 
+            {
+                "modifier": 1,
+                "use":
+                [
+                    "{0} climbs using a dagger as a fulcrum."
+                ]
+            }
+        },
+        "name": "Short dagger",
+        "desc": "Worn but still sharp blade.  5 inch long."
+    }
+],
 "player": 
 {
     "id": "player",
-    "name": "Rim Dragonslayer",
+    "name":
+    [
+        "Rim the Dragonslayer",
+        "Rim",
+        "the Dragonslayer",
+        "You"
+    ],
     "hp": 5,
     "modifier": -2,
     "minValToSuccess": 5,
@@ -52,37 +136,27 @@
                 ]
             }
     },
-    "skills": [
-        {
-            "id": "sneaking",
-            "name": "Sneaking",
-            "desc": "Used to sneak somewhere.",
-            "value": 3
-        },
-        {
-            "id": "climbing",
-            "name": "Climbing",
-            "desc": "Used to climb somewhere.",
-            "value": 3
-        },
-        {
-            "id": "melee",
-            "name": "Melee",
-            "desc": "Used to battle with somebody in melee.",
-            "value": 3
-        },
-        {
-            "id": "dancing",
-            "name": "Dancing",
-            "desc": "Used to dance. Not used yet, added as an example of skill that is require unlock.",
-            "value": 0
-        }
-    ]
+    "skills":
+    {
+        "sneaking": 3,
+        "climbing": 3,
+        "melee": 3
+    },
+    "items":
+    {
+        "dagger": 1
+    }
 },
-"mobs": [
+"mobs":
+[
     {
         "id": "dragon",
-        "name": "Dragon",       
+        "name":
+        [
+            "Dragon",
+            "The Greatest",
+            "The Ancient One"
+        ],
         "hp": 2,
         "modifier": -5,
         "minValToSuccess": 7,
@@ -110,17 +184,14 @@
                 ]
             }
         },
-        "skills": [
-            {
-                "id": "melee",
-                "name": "Melee",
-                "desc": "Used to battle with somebody in melee.",
-                "value": 3
-            }
-        ]
+        "skills": 
+        {
+            "melee": 3
+        }
     }
 ],
-"rooms": [
+"rooms":
+[
     {
         "id": "forest1",
         "desc": "You're at the end of a footpath. A deadfall in front prevents you from moving deeper in the forest",

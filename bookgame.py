@@ -4,10 +4,14 @@ import sys
 import getopt
 import random
 
-rooms = {}
+rooms = []
 player = {}
-mobs = {}
+mobs = []
+skills = []
+items = []
 difficulty = []
+inputRequest = []
+availableExits = []
 gameoverTexts = {}
 currentRoomId = ""
 
@@ -20,6 +24,12 @@ def debugOutputStr(string, debugLevel):
     global debug
     if (debug >= debugLevel):
         outputStr(string)
+
+def outputLine():
+    outputStr("________________________")
+
+def outputShortLine():
+    outputStr("___________")
 
 def getSaveFilename(bookDataFilename):
     saveGameFilename = bookDataFilename.split(".")[0] + ".sav"
@@ -57,11 +67,15 @@ def getDiceParams(diceString):
     result = {"amount": amount, "sides": sides, "modifier": modifier}
     return result
 
-def loadData(bookDataFilename, needLoadSave):        
+def loadData(bookDataFilename, needLoadSave):
     global rooms
     global player
     global mobs
+    global skills
+    global items
     global difficulty
+    global inputRequest
+    global availableExits
     global currentRoomId
     
     debugOutputStr("%s opening..."%(bookDataFilename), 0)
@@ -74,8 +88,12 @@ def loadData(bookDataFilename, needLoadSave):
                 rooms = bookJson["rooms"]
                 player = bookJson["player"]
                 mobs = bookJson["mobs"]
+                skills = bookJson["skills"]
+                items = bookJson["items"]
                 gameoverTexts = bookJson["gameover"]
                 difficulty = bookJson["skillcheckDifficulty"]
+                inputRequest = bookJson["inputRequest"]
+                availableExits = bookJson["availableExits"]
                 fbook.close()
                 
                 currentRoomId = entry
@@ -128,22 +146,52 @@ def saveGame(bookDataFilename):
     
 def printRoomDialog(room):
     global currentRoomId
-    outputStr("________________________")
+    global player
+    
+    outputLine()
     outputStr(room["desc"])
     
     encounter = getRoomEncounter(room)
     if encounter != "":
         outputStr(encounter)
         
-    outputStr("___________")
-    outputStr("Possible exits:")
+    outputShortLine()
+    outputStr(getAvailableExits())
     for idx, exit in enumerate(room["exits"]):
         outputStr("%d: %s"%(int(idx + 1), getExitDescription(exit)))
-    exNum = input("Your choise:")
-    if (exNum > 0) and (exNum <= len(room["exits"])):
-        exit = room["exits"][exNum - 1]
-        if tryLeaveRoom(exit):
-            currentRoomId = exit["id"]
+    userInput = raw_input(getInputRequest())
+    if userInput in ("skills", "skill", "s"):
+        printSkills(player)
+    elif userInput in ("items", "item", "i"):
+        printItems(player)
+    else:
+        try:
+            exNum = int(userInput)
+            if(exNum > 0) and (exNum <= len(room["exits"])):
+                exit = room["exits"][exNum - 1]
+                if tryLeaveRoom(exit):
+                    currentRoomId = exit["id"]
+        except ValueError:
+            return
+
+def printSkills(mob):
+    if "skills" in mob:
+        for skillid in mob["skills"].keys():
+            skillval = mob["skills"][skillid]
+            skillDef = getSkill(skillid)
+            outputShortLine()
+            outputStr("%s [%+d]:\n%s"%(skillDef["name"], skillval, skillDef["desc"]))
+
+def printItems(mob):
+    if "items" in mob:
+        for itemid in mob["items"].keys():
+            outputShortLine()
+            itemDef = getItem(itemid)
+            outputStr("%s:\n%s"%(itemDef["name"], itemDef["desc"]))
+            for skillid in itemDef["type"].keys():
+                skill = getSkill(skillid)
+                modifier = itemDef["type"][skillid]["modifier"]
+                outputStr("%s: [%+d]"%(skill["name"], modifier))
 
 def tryLeaveRoom(exit):
     ev = exit["event"]
@@ -175,13 +223,13 @@ def runEvent(event):
             if "modifier" in mob and not checkMobSavedInfo(mob, "absent", currentRoomId):
                 while True:
                     modifier = mob["modifier"] + event["modifier"]
-                    hit = checkSkill(player, getCombatSkill(), modifier)
+                    hit = checkSkill(player, getCombatSkillId(), modifier)
                     outputStr(getAttackDescription(player, hit))
                     if hit:                        
                         if tryKill(mob, 1):
                             result = True
                             break
-                    hit = checkSkill(mob, getCombatSkill(), player["modifier"])
+                    hit = checkSkill(mob, getCombatSkillId(), player["modifier"])
                     outputStr(getAttackDescription(mob, hit))
                     if hit:
                         if tryKill(player, 1):
@@ -234,24 +282,25 @@ def gameOver(gameoverId):
         
 
 def checkSkill(pretender, skillid, mod):
-    for skill in pretender["skills"]:
-        if skill["id"] == skillid:
-            skillbase = skill["value"]
-            skillval = skillbase + mod
-            valtosuccess = pretender["minValToSuccess"]
-            debugOutputStr("%s's checkskill: %s, pretenders skill: %d + %d = %d"%(pretender["id"], skillid, skillbase, mod, skillval), 1)
-            for i in range(0, skillval):
-                dice = diceroll(pretender["diceToSkillcheck"])
-                debugOutputStr("dice %s: %d/%d"%(pretender["diceToSkillcheck"], dice, valtosuccess), 1)
-                if dice >= valtosuccess:
-                    return True
+    skillval = getSkillWithMods(pretender, skillid, mod)
+    valtosuccess = pretender["minValToSuccess"]
+    
+    outputStr(getItemUseDescription(pretender, skillid))
+    debugOutputStr("%s's checkskill: %s, pretenders effective skill: %d"%(pretender["id"], skillid, skillval), 1)
+    for i in range(0, skillval):
+        dice = diceroll(pretender["diceToSkillcheck"])
+        debugOutputStr("dice %s: %d/%d"%(pretender["diceToSkillcheck"], dice, valtosuccess), 1)
+        if dice >= valtosuccess:
+            return True
             break
+            
     return False
 
 def incSkill(pretender, skillid):
-    for skill in pretender["skills"]:
-        if skill["id"] == skillid:
-            skill["value"] += 1
+    if skillid in pretender["skills"]:
+        pretender["skills"][skillid] += 1
+    else:
+        pretender["skills"][skillid] = 1
             
 def getExitDescription(exit):
     global currentRoomId
@@ -264,16 +313,20 @@ def getExitDescription(exit):
         if exit["event"]["type"] == "mobbattle":
             mob = getMob(exit["event"]["param"])
             if not checkMobSavedInfo(mob, "absent", currentRoomId):
-                skillid = getCombatSkill()
+                skillid = getCombatSkillId()
                 mod = mob["modifier"]
         elif exit["event"]["type"] == "skillcheck":
             skillid = exit["event"]["param"]
             
         if skillid != "":
             mod += exit["event"]["modifier"]
+            
+            skillval = getSkillWithMods(player, skillid, mod)
+                
             skill = getSkill(skillid)
-            mod += skill["value"]
-            extended = " (" + skill["name"] + ": " + getSkillcheckDifficulty(mod) + ")"
+            if "name" in skill:
+                extended = " (" + skill["name"] + ": " + getSkillcheckDifficulty(skillval) + ")"
+                
         desc += extended
     return desc
 
@@ -300,13 +353,45 @@ def checkMobSavedInfo(mob, type, data):
         return False
 
 def getSkill(skillid):
-    global player    
-    for skill in player["skills"]:
+    global skills
+    for skill in skills:
         if skill["id"] == skillid:
             return skill
     return {}
 
-def getCombatSkill():
+def getItem(itemid):
+    global items
+    for item in items:
+        if item["id"] == itemid:
+            return item
+    return {}
+
+def getAffectingItems(mob, skillid):
+    global items
+    affectingItems = []
+    if "items" in mob:
+        for itemid in mob["items"].keys():
+            for item in items:
+                if item["id"] == itemid:
+                    if skillid in item["type"]:
+                        affectingItems.append(item)
+    return affectingItems
+
+def getSkillWithMods(pretender, skillid, mod):
+    skillbase = 0
+    if skillid in pretender["skills"]:
+        skillbase = pretender["skills"][skillid]
+        
+    affectingItems = getAffectingItems(pretender, skillid)
+    itemsBonus = 0
+    if len(affectingItems):
+        for item in affectingItems:
+            itemsBonus += item["type"][skillid]["modifier"]
+        
+    skillval = skillbase + mod + itemsBonus
+    return skillval
+    
+def getCombatSkillId():
     return "melee"
 
 def getSkillcheckDifficulty(attemptsAmount):
@@ -314,7 +399,7 @@ def getSkillcheckDifficulty(attemptsAmount):
     global difficulty
     global debug
     
-    dice = player["diceToSkillcheck"]    
+    dice = player["diceToSkillcheck"]
     minval = player["minValToSuccess"]
     params = getDiceParams(dice)
     dicemin = params["amount"] + params["modifier"]
@@ -373,6 +458,29 @@ def getAttackDescription(attacker, isSuccess):
                 text = random.choice(onattack[id])
     return text
 
+def getItemUseDescription(pretender, skillid):
+    text = ""
+    items = getAffectingItems(pretender, skillid)
+    if len(items):
+        item = random.choice(items)
+        text = random.choice(item["type"][skillid]["use"])
+        text = text.format(getName(pretender))
+    return text
+    
+def getInputRequest():
+    global inputRequest
+    result = random.choice(inputRequest)
+    return result
+
+def getAvailableExits():
+    global availableExits
+    result = random.choice(availableExits)
+    return result
+    
+def getName(mob):
+    result = random.choice(mob["name"])
+    return result
+
 def main(argv):
     global debug
     
@@ -393,7 +501,7 @@ def main(argv):
         elif opt in ("-d", "--debug"):
             debug = int(arg)
         elif opt in ("-n", "--newgame"):
-            needLoadSave = False            
+            needLoadSave = False
     
     if loadData(bookDataFilename, needLoadSave):
         while True:
@@ -403,4 +511,5 @@ def main(argv):
                     saveGame(bookDataFilename)
         
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    #main(sys.argv[1:])
+    main(["-i", "bookgame.json", "-d", "2", "-n"])
