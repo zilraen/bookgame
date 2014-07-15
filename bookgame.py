@@ -218,6 +218,10 @@ def runEvent(event):
             result = checkSkill(player, event["param"], event["modifier"])
         elif event["type"] == "skillinc":
             incSkill(player, event["param"])
+        elif event["type"] == "additem":
+            addItem(player, event["param"])
+        elif event["type"] == "removeitem":
+            removeItem(player, event["param"])
         elif event["type"] == "mobbattle":
             mob = getMob(event["param"])
             if "modifier" in mob and not checkMobSavedInfo(mob, "absent", currentRoomId):
