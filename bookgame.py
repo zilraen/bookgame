@@ -301,7 +301,20 @@ def incSkill(pretender, skillid):
         pretender["skills"][skillid] += 1
     else:
         pretender["skills"][skillid] = 1
-            
+        
+def addItem(pretender, itemid):
+    if itemid in pretender["items"]:
+        pretender["items"][itemid] += 1
+    else:
+        pretender["items"][itemid] = 1
+
+def removeItem(pretender, itemid):
+    if itemid in pretender["items"]:
+        pretender["items"][itemid] -= 1
+        
+        if pretender["items"][itemid] <= 0:
+            del pretender["items"][itemid]
+
 def getExitDescription(exit):
     global currentRoomId
     
