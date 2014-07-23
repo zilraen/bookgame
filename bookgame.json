@@ -43,22 +43,80 @@
     {
         "id": "sneaking",
         "name": "Sneaking",
-        "desc": "Used to sneak somewhere."
+        "desc":
+        {
+			"default": "Used to sneak somewhere.",
+			"use":
+			[
+				"{0} sneaks in shadows."
+			],
+			"success": [],
+			"fail": []
+		}
     },
     {
         "id": "climbing",
         "name": "Climbing",
-        "desc": "Used to climb somewhere."
+        "desc":
+        {
+			"default": "Used to climb somewhere.",
+			"use":
+			[
+				"{0} shows his best in grasping."
+			],
+			"success":
+			[
+				"... successfully!"
+			],
+			"fail":
+			[
+				"... but fails!"
+			]
+		}
     },
     {
         "id": "melee",
         "name": "Melee",
-        "desc": "Used to battle with somebody in melee."
+        "desc":
+        {
+			"default": "Used to battle with somebody in melee.",
+			"use":
+			[				
+				"{0} strikes viciously.",
+				"{0} performs strong hit."
+			],
+			"success": [],
+			"fail": []
+		}
+    },
+    {
+        "id": "evasion",
+        "name": "Evasion",
+        "desc":
+        {
+			"default": "Used to evade something that could harm you.",
+			"use": [],
+			"success":
+			[
+				"{0} dodges.",
+				"{0} successfully evades it."
+			],
+			"fail": []
+		}
     },
     {
         "id": "dancing",
         "name": "Dancing",
-        "desc": "Used to dance. Not used yet, added as an example of skill that is require unlock."
+        "desc":
+        {
+			"default": "Used to dance. Not in this module yet, added as an example of skill that is require unlock.",
+			"use":
+			[
+				"{0} whirl in dance."
+			],
+			"success": [],
+			"fail": []
+		}
     }
 ],
 "items":
@@ -73,7 +131,9 @@
                 "use":
                 [
                     "{0} hit hard with heavy mace."
-                ]
+                ],
+				"success": [],
+				"fail": []
             }
         },
         "name": "Iron Mace",
@@ -89,7 +149,9 @@
                 "use":
                 [
                     "{0} thrusts with dagger on the sly."
-                ]
+                ],
+				"success": [],
+				"fail": []
             },
             "climbing": 
             {
@@ -97,7 +159,9 @@
                 "use":
                 [
                     "{0} climbs using a dagger as a fulcrum."
-                ]
+                ],
+				"success": [],
+				"fail": []
             }
         },
         "name": "Short dagger",
@@ -111,8 +175,8 @@
     [
         "Rim the Dragonslayer",
         "Rim",
-        "the Dragonslayer",
-        "You"
+        "The Dragonslayer",
+        "Protagonist"
     ],
     "hp": 5,
     "modifier": -2,
@@ -120,21 +184,6 @@
     "diceToSkillcheck": "1d6",
     "desc":
     {
-        "onattack":
-            {
-                "hit":
-                [
-                    "You hit hard with your mace.",
-                    "You bash enemy with your shield.",
-                    "You thrust enemy with your dagger."
-                ],
-                "miss":
-                [
-                    "You swing and miss.",
-                    "You thrust, but enemy's armor protects him.",
-                    "You push with shield but lost your balance. Fortunately enemy lost his balance too."
-                ]
-            }
     },
     "skills":
     {
@@ -157,7 +206,7 @@
             "The Greatest",
             "The Ancient One"
         ],
-        "hp": 2,
+        "hp": 10,
         "modifier": -5,
         "minValToSuccess": 7,
         "diceToSkillcheck": "1d8+2",
@@ -167,21 +216,6 @@
             "onappear":
             {
                 "mount1": "When you climbed the mount, you see that a great dragon came out from a cave and lay on a warm stones. Now he didn't see you, but if you attempt to descent, he'll most likely notice you."
-            },
-            "onattack":
-            {
-                "hit":
-                [
-                    "A dragon's tail swing send you fly.",
-                    "You got burned by a dragon's flame.",
-                    "Dragon grab you with claws and throw on the rocks. It's VERY painful."
-                ],
-                "miss":
-                [
-                    "Dragon's tail whizzed above your head.",
-                    "A dragon's flame melts some rocks near you.",
-                    "Dragon grab a large stone by his claws and throw it away. Fortunately, it wasn't you."
-                ]
             }
         },
         "skills": 

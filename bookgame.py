@@ -23,7 +23,7 @@ def outputStr(string):
 def debugOutputStr(string, debugLevel):
     global debug
     if (debug >= debugLevel):
-        outputStr(string)
+        outputStr("debug %d/%d: %s"%(debugLevel, debug, string))
 
 def outputLine():
     outputStr("________________________")
@@ -180,7 +180,7 @@ def printSkills(mob):
             skillval = mob["skills"][skillid]
             skillDef = getSkill(skillid)
             outputShortLine()
-            outputStr("%s [%+d]:\n%s"%(skillDef["name"], skillval, skillDef["desc"]))
+            outputStr("%s [%+d]:\n%s"%(skillDef["name"], skillval, skillDef["desc"]["default"]))
 
 def printItems(mob):
     if "items" in mob:
@@ -192,6 +192,14 @@ def printItems(mob):
                 skill = getSkill(skillid)
                 modifier = itemDef["type"][skillid]["modifier"]
                 outputStr("%s: [%+d]"%(skill["name"], modifier))
+
+def printMobShortInfo(mob, damage=0):
+    name = getName(mob)
+    hp = mob["hp"]
+    if damage == 0:
+        outputStr("%s: %dhp"%(name, hp))
+    else:
+        outputStr("%s: %dhp -%dhp!"%(name, hp, damage))
 
 def tryLeaveRoom(exit):
     ev = exit["event"]
@@ -215,26 +223,29 @@ def runEvent(event):
             if tryKill(player, event["param"]):
                 gameover("death")
         elif event["type"] == "skillcheck":
-            result = checkSkill(player, event["param"], event["modifier"])
+            result = (checkSkill(player, event["param"], event["modifier"]) > 0)
         elif event["type"] == "skillinc":
             incSkill(player, event["param"])
+        elif event["type"] == "additem":
+            addItem(player, event["param"])
+        elif event["type"] == "removeitem":
+            removeItem(player, event["param"])
         elif event["type"] == "mobbattle":
             mob = getMob(event["param"])
             if "modifier" in mob and not checkMobSavedInfo(mob, "absent", currentRoomId):
                 while True:
                     modifier = mob["modifier"] + event["modifier"]
                     hit = checkSkill(player, getCombatSkillId(), modifier)
-                    outputStr(getAttackDescription(player, hit))
-                    if hit:                        
-                        if tryKill(mob, 1):
+                    if not checkSkill(mob, getDefenceSkillId(), 0, (hit <= 0)):                
+                        if tryKill(mob, hit):
                             result = True
                             break
                     hit = checkSkill(mob, getCombatSkillId(), player["modifier"])
-                    outputStr(getAttackDescription(mob, hit))
-                    if hit:
-                        if tryKill(player, 1):
+                    if not checkSkill(player, getDefenceSkillId(), 0, (hit <= 0)):
+                        if tryKill(player, hit):
                             result = False
                             break
+                outputShortLine()
         elif event["type"] == "mobremove":
             mobid, location = event["param"].split("@")
             addMobSavedInfo(getMob(mobid), "absent", location)
@@ -259,8 +270,9 @@ def runEvent(event):
     
     return result
 
-def tryKill(pretender, amount):
-    pretender["hp"] -= amount
+def tryKill(pretender, damage):
+    printMobShortInfo(pretender, damage)
+    pretender["hp"] -= damage
     if pretender["hp"] <= 0:
         #pretender is dead
         return True
@@ -281,27 +293,53 @@ def gameOver(gameoverId):
     sys.exit(1)
         
 
-def checkSkill(pretender, skillid, mod):
+def checkSkill(pretender, skillid, mod=0, autosuccess=False):
+    succeedCount = 0
     skillval = getSkillWithMods(pretender, skillid, mod)
-    valtosuccess = pretender["minValToSuccess"]
+    valtosuccess = pretender["minValToSuccess"]    
     
-    outputStr(getItemUseDescription(pretender, skillid))
-    debugOutputStr("%s's checkskill: %s, pretenders effective skill: %d"%(pretender["id"], skillid, skillval), 1)
-    for i in range(0, skillval):
-        dice = diceroll(pretender["diceToSkillcheck"])
-        debugOutputStr("dice %s: %d/%d"%(pretender["diceToSkillcheck"], dice, valtosuccess), 1)
-        if dice >= valtosuccess:
-            return True
-            break
-            
-    return False
+    debugOutputStr("%s's checkskill: %s, effective skill: %d, autosuccess: %s"%(pretender["id"], skillid, skillval, str(autosuccess)), 1)
+    
+    printSkillUseDescription(pretender, skillid)
+    
+    if autosuccess:
+		if skillval > 0:
+			succeedCount = skillval
+		else:
+			succeedCount = 1
+    else:
+        for i in range(0, skillval):
+            dice = diceroll(pretender["diceToSkillcheck"])
+            debugOutputStr("dice %s: %d/%d"%(pretender["diceToSkillcheck"], dice, valtosuccess), 1)
+            if dice >= valtosuccess:
+                succeedCount += 1
+        
+    if succeedCount > 0:
+        printSkillSuccessDescription(pretender, skillid)
+    else:
+        printSkillFailDescription(pretender, skillid)     
+    
+    return succeedCount
 
 def incSkill(pretender, skillid):
     if skillid in pretender["skills"]:
         pretender["skills"][skillid] += 1
     else:
         pretender["skills"][skillid] = 1
-            
+        
+def addItem(pretender, itemid):
+    if itemid in pretender["items"]:
+        pretender["items"][itemid] += 1
+    else:
+        pretender["items"][itemid] = 1
+
+def removeItem(pretender, itemid):
+    if itemid in pretender["items"]:
+        pretender["items"][itemid] -= 1
+        
+        if pretender["items"][itemid] <= 0:
+            del pretender["items"][itemid]
+
 def getExitDescription(exit):
     global currentRoomId
     
@@ -394,6 +432,9 @@ def getSkillWithMods(pretender, skillid, mod):
 def getCombatSkillId():
     return "melee"
 
+def getDefenceSkillId():
+    return "evasion"
+
 def getSkillcheckDifficulty(attemptsAmount):
     global player
     global difficulty
@@ -445,27 +486,65 @@ def getRoomEncounter(room):
                     break
     return ""
 
-def getAttackDescription(attacker, isSuccess):
-    text = ""
-    if "desc" in attacker:
-        if "onattack" in attacker["desc"]:
-            if isSuccess:
-                id = "hit"
-            else:
-                id = "miss"
-            onattack = attacker["desc"]["onattack"]
-            if id in onattack:
-                text = random.choice(onattack[id])
-    return text
-
 def getItemUseDescription(pretender, skillid):
-    text = ""
+    texts = []
     items = getAffectingItems(pretender, skillid)
-    if len(items):
-        item = random.choice(items)
-        text = random.choice(item["type"][skillid]["use"])
+    for item in items:
+        texts += item["type"][skillid]["use"]
+    return texts
+
+def getItemSuccessDescription(pretender, skillid):
+    texts = []
+    items = getAffectingItems(pretender, skillid)
+    for item in items:
+        texts += item["type"][skillid]["success"]
+    return texts
+
+def getItemFailDescription(pretender, skillid):
+    texts = []
+    items = getAffectingItems(pretender, skillid)
+    for item in items:
+        texts += item["type"][skillid]["fail"]
+    return texts
+
+def printSkillUseDescription(pretender, skillid):
+    text = ""
+    texts = []
+    skill = getSkill(skillid)
+    texts += skill["desc"]["use"]
+    texts += getItemUseDescription(pretender, skillid)
+    if len(texts) > 0:
+        text = random.choice(texts)
         text = text.format(getName(pretender))
-    return text
+        
+    if len(text) > 0:
+        outputStr(text)
+
+def printSkillSuccessDescription(pretender, skillid):
+    text = ""
+    texts = []
+    skill = getSkill(skillid)
+    texts += skill["desc"]["success"]
+    texts += getItemSuccessDescription(pretender, skillid)
+    if len(texts) > 0:
+        text = random.choice(texts)
+        text = text.format(getName(pretender))
+        
+    if len(text) > 0:
+        outputStr(text)
+    
+def printSkillFailDescription(pretender, skillid):
+    text = ""
+    texts = []
+    skill = getSkill(skillid)
+    texts += skill["desc"]["fail"]
+    texts += getItemFailDescription(pretender, skillid)    
+    if len(texts) > 0:
+        text = random.choice(texts)
+        text = text.format(getName(pretender))
+    
+    if len(text) > 0:
+        outputStr(text)
     
 def getInputRequest():
     global inputRequest
