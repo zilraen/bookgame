@@ -280,7 +280,7 @@ def tryKill(pretender, damage):
 def gameOver(gameoverId):
     global gameoverTexts
     
-    # Default text for case is all texts are unavailable. Should be never used.
+    # Default text for case if all gameover texts are unavailable. Should be never used.
     text = "GAME OVER."
     if gameoverId not in gameoverTexts:
         gameoverId = "default"
