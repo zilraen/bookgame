@@ -1,388 +1,348 @@
 {
-"entry": "forest2",
-"skillcheckDifficulty":
-[
-    "Impossible",
-    "Hard",
-    "Moderate",
-    "Easy",
-    "Very easy"
-],
-"inputRequest":
-[
-    "Thy choise? ",
-    "Thy actions? ",
-    "Myl'rd? "
-],
-"availableExits":
-[
-    "Possible exits: ",
-    "You can go: ",
-    "Places to go: "
-],
-"gameover":
-{
-    "default":
-    [
-        "Your quest is failed."
-    ],
-    "death":
-    [
-        "You're dead.",
-        "You die in middle of nowhere."
-    ],
-    "killedByDragon":
-    [
-        "You burn in dragon's flame.",
-        "You're teared by dragon.",
-        "You had been eaten by dragon."
-    ]
-},
-"skills":
-[
-    {
-        "id": "sneaking",
-        "name": "Sneaking",
-        "desc":
-        {
-			"default": "Used to sneak somewhere.",
-			"use":
-			[
-				"{0} sneaks in shadows."
-			],
-			"success": [],
-			"fail": []
-		}
-    },
-    {
-        "id": "climbing",
-        "name": "Climbing",
-        "desc":
-        {
-			"default": "Used to climb somewhere.",
-			"use":
-			[
-				"{0} shows his best in grasping."
-			],
-			"success":
-			[
-				"... successfully!"
-			],
-			"fail":
-			[
-				"... but fails!"
-			]
-		}
-    },
-    {
-        "id": "melee",
-        "name": "Melee",
-        "desc":
-        {
-			"default": "Used to battle with somebody in melee.",
-			"use":
-			[				
-				"{0} strikes viciously.",
-				"{0} performs strong hit."
-			],
-			"success": [],
-			"fail": []
-		}
-    },
-    {
-        "id": "evasion",
-        "name": "Evasion",
-        "desc":
-        {
-			"default": "Used to evade something that could harm you.",
-			"use": [],
-			"success":
-			[
-				"{0} dodges.",
-				"{0} successfully evades it."
-			],
-			"fail": []
-		}
-    },
-    {
-        "id": "dancing",
-        "name": "Dancing",
-        "desc":
-        {
-			"default": "Used to dance. Not in this module yet, added as an example of skill that is require unlock.",
-			"use":
-			[
-				"{0} whirl in dance."
-			],
-			"success": [],
-			"fail": []
-		}
-    }
-],
-"items":
-[
-    {
-        "id": "mace",
-        "type":
-        {
-            "melee": 
-            {
-                "modifier": 2,
-                "use":
-                [
-                    "{0} hit hard with heavy mace."
-                ],
-				"success": [],
-				"fail": []
+   "entry":"forest2",
+   "skillcheckDifficulty":[
+      "Impossible",
+      "Hard",
+      "Moderate",
+      "Easy",
+      "Very easy"
+   ],
+   "inputRequest":[
+      "Thy choise? ",
+      "Thy actions? ",
+      "Myl'rd? "
+   ],
+   "availableExits":[
+      "Possible exits: ",
+      "You can go: ",
+      "Places to go: "
+   ],
+   "gameover":{
+      "default":[
+         "Your quest is failed."
+      ],
+      "death":[
+         "You're dead.",
+         "You die in middle of nowhere."
+      ],
+      "killedByDragon":[
+         "You burn in dragon's flame.",
+         "You're teared by dragon.",
+         "You had been eaten by dragon."
+      ]
+   },
+   "skills":[
+      {
+         "id":"sneaking",
+         "name":"Sneaking",
+         "desc":{
+            "default":"Used to sneak somewhere.",
+            "use":[
+               "{0} sneaks in shadows."
+            ],
+            "success":[
+
+            ],
+            "fail":[
+
+            ]
+         }
+      },
+      {
+         "id":"climbing",
+         "name":"Climbing",
+         "desc":{
+            "default":"Used to climb somewhere.",
+            "use":[
+               "{0} shows his best in grasping."
+            ],
+            "success":[
+               "... successfully!"
+            ],
+            "fail":[
+               "... but fails!"
+            ]
+         }
+      },
+      {
+         "id":"melee",
+         "name":"Melee",
+         "desc":{
+            "default":"Used to battle with somebody in melee.",
+            "use":[
+               "{0} strikes viciously.",
+               "{0} performs strong hit."
+            ],
+            "success":[
+
+            ],
+            "fail":[
+
+            ]
+         }
+      },
+      {
+         "id":"evasion",
+         "name":"Evasion",
+         "desc":{
+            "default":"Used to evade something that could harm you.",
+            "use":[
+
+            ],
+            "success":[
+               "{0} dodges.",
+               "{0} successfully evades damage."
+            ],
+            "fail":[
+
+            ]
+         }
+      },
+      {
+         "id":"dancing",
+         "name":"Dancing",
+         "desc":{
+            "default":"Used to dance. Not in this module yet, added as an example of skill that is require unlock.",
+            "use":[
+               "{0} whirl in dance."
+            ],
+            "success":[
+
+            ],
+            "fail":[
+
+            ]
+         }
+      }
+   ],
+   "items":[
+      {
+         "id":"mace",
+         "type":{
+            "melee":{
+               "modifier":2,
+               "use":[
+                  "{0} hit hard with heavy mace."
+               ],
+               "success":[
+
+               ],
+               "fail":[
+
+               ]
             }
-        },
-        "name": "Iron Mace",
-        "desc": "Rusty iron mace."
-    },
-    {
-        "id": "dagger",
-        "type": 
-        {
-            "melee": 
-            {
-                "modifier": 1,
-                "use":
-                [
-                    "{0} thrusts with dagger on the sly."
-                ],
-				"success": [],
-				"fail": []
+         },
+         "name":"Iron Mace",
+         "desc":"Rusty iron mace."
+      },
+      {
+         "id":"dagger",
+         "type":{
+            "melee":{
+               "modifier":1,
+               "use":[
+                  "{0} thrusts with dagger on the sly."
+               ],
+               "success":[
+
+               ],
+               "fail":[
+
+               ]
             },
-            "climbing": 
-            {
-                "modifier": 1,
-                "use":
-                [
-                    "{0} climbs using a dagger as a fulcrum."
-                ],
-				"success": [],
-				"fail": []
+            "climbing":{
+               "modifier":1,
+               "use":[
+                  "{0} climbs using a dagger as a fulcrum."
+               ],
+               "success":[
+
+               ],
+               "fail":[
+
+               ]
             }
-        },
-        "name": "Short dagger",
-        "desc": "Worn but still sharp blade.  5 inch long."
-    }
-],
-"player": 
-{
-    "id": "player",
-    "name":
-    [
-        "Rim the Dragonslayer",
-        "Rim",
-        "The Dragonslayer",
-        "Protagonist"
-    ],
-    "hp": 5,
-    "modifier": -2,
-    "minValToSuccess": 5,
-    "diceToSkillcheck": "1d6",
-    "desc":
-    {
-    },
-    "skills":
-    {
-        "sneaking": 3,
-        "climbing": 3,
-        "melee": 3
-    },
-    "items":
-    {
-        "dagger": 1
-    }
-},
-"mobs":
-[
-    {
-        "id": "dragon",
-        "name":
-        [
+         },
+         "name":"Short dagger",
+         "desc":"Worn but still sharp blade.  5 inch long."
+      }
+   ],
+   "player":{
+      "id":"player",
+      "name":[
+         "Rim the Dragonslayer",
+         "Rim",
+         "The Dragonslayer",
+         "Protagonist"
+      ],
+      "hp":5,
+      "modifier":-2,
+      "minValToSuccess":5,
+      "diceToSkillcheck":"1d6",
+      "desc":{
+
+      },
+      "skills":{
+         "sneaking":3,
+         "climbing":3,
+         "melee":3
+      },
+      "items":{
+         "dagger":1
+      }
+   },
+   "mobs":[
+      {
+         "id":"dragon",
+         "name":[
             "Dragon",
             "The Greatest",
             "The Ancient One"
-        ],
-        "hp": 10,
-        "modifier": -5,
-        "minValToSuccess": 7,
-        "diceToSkillcheck": "1d8+2",
-        "desc":
-        {
-            "default": "An ancient dragon, dread and terrifying!",
-            "onappear":
-            {
-                "mount1": "When you climbed the mount, you see that a great dragon came out from a cave and lay on a warm stones. Now he didn't see you, but if you attempt to descent, he'll most likely notice you."
+         ],
+         "hp":10,
+         "modifier":-5,
+         "minValToSuccess":7,
+         "diceToSkillcheck":"1d8+2",
+         "desc":{
+            "default":"An ancient dragon, dread and terrifying!",
+            "onappear":{
+               "mount1":"When you climbed the mount, you see that a great dragon came out from a cave and lay on a warm stones. Now he didn't see you, but if you attempt to descent, he'll most likely notice you."
             }
-        },
-        "skills": 
-        {
-            "melee": 3
-        }
-    }
-],
-"rooms":
-[
-    {
-        "id": "forest1",
-        "desc": "You're at the end of a footpath. A deadfall in front prevents you from moving deeper in the forest",
-        "exits":
-        [
+         },
+         "skills":{
+            "melee":3
+         }
+      }
+   ],
+   "rooms":[
+      {
+         "id":"forest1",
+         "desc":"You're at the end of a footpath. A deadfall in front prevents you from moving deeper in the forest",
+         "exits":[
             {
-                "id": "forest2",
-                "desc": "A little footpath leading back to edge if the wood",
-                "event": {}
+               "id":"forest2",
+               "desc":"A little footpath leading back to edge if the wood",
+               "event":{
+
+               }
             }
-        ]
-    },
-    {
-        "id": "forest2",
-        "desc": "You're standing on edge of the wood.",
-        "exits":
-        [
+         ]
+      },
+      {
+         "id":"forest2",
+         "desc":"You're standing on edge of the wood.",
+         "exits":[
             {
-                "id": "forest1",
-                "desc": "A little footpath deeper in forest",
-                "event": {}
+               "id":"forest1",
+               "desc":"A little footpath deeper in forest",
+               "event":{
+
+               }
             },
             {
-                "id": "mount1",
-                "desc": "A steep stone wall. You could try to climb it to reach a plateau on the top of mount.",
-                "event":
-                {
-                    "text": "You decided to climb the mount.",
-                    "type": "skillcheck",
-                    "param": "climbing",
-                    "modifier": 1,
-                    "success":
-                    {
-                        "text": "You sucessfully climb on the mount. You fell much more skillful in climbing now.",
-                        "events":
-                        [
-                            {
-                                "type": "skillinc",
-                                "param": "climbing"
-                            }
-                        ]
-                    },
-                    "fail":
-                    {
-                        "text": "You fall on a ground. That was REALLY painful!",
-                        "events":
-                        [
-                            {
-                                "type": "damage",
-                                "param": 1
-                            }
-                        ]
-                    }
-                }
+               "id":"mount1",
+               "desc":"A steep stone wall. You could try to climb it to reach a plateau on the top of mount.",
+               "event":{
+                  "text":"You decided to climb the mount.",
+                  "type":"skillcheck",
+                  "param":"climbing",
+                  "modifier":1,
+                  "success":[
+                     {
+                        "type":"skillinc",
+                        "text":"You sucessfully climb on the mount. You fell much more skillful in climbing now.",
+                        "param":"climbing"
+                     }
+                  ],
+                  "fail":[
+                     {
+                        "type":"damage",
+                        "text":"You fall on a ground. That was REALLY painful!",
+                        "param":1
+                     }
+                  ]
+               }
             }
-        ]
-    },
-    {
-        "id": "mount1",
-        "desc": "You're standing at a plateau on the top of mount.",
-        "exits":
-        [
+         ]
+      },
+      {
+         "id":"mount1",
+         "desc":"You're standing at a plateau on the top of mount.",
+         "exits":[
             {
-                "id": "forest2",
-                "desc": "A way back to wood's edge.",
-                "event":
-                {
-                    "type": "mobbattle",
-                    "param": "dragon",
-                    "modifier": 5,
-                    "success":
-                    {
-                        "text": "You killed the dragon and went down to forest edge.",
-                        "events":
-                        [
-                            {
-                                "type": "mobremove",
-                                "param": "dragon@mount1"
-                            },
-                            {
-                                "type": "skillinc",
-                                "param": "melee"
-                            }
-                        ]
-                    },
-                    "fail":
-                    {
-                        "text": "You lose in battle with dragon.",
-                        "events":
-                        [
-                            {
-                                "type": "gameover",
-                                "param": "killedByDragon"
-                            }
-                        ]
-                    }
-                }
+               "id":"forest2",
+               "desc":"A way back to wood's edge.",
+               "event":{
+                  "type":"mobbattle",
+                  "param":"dragon",
+                  "modifier":5,
+                  "success":[
+                     {
+                        "type":"mobremove",
+                        "text":"You killed the dragon and went down to forest edge.",
+                        "param":"dragon@mount1"
+                     },
+                     {
+                        "type":"skillinc",
+                        "text":"You analyse the battle and become much more experienced in close quarters combat.",
+                        "param":"melee"
+                     }
+                  ],
+                  "fail":[
+                     {
+                        "type":"gameover",
+                        "param":"killedByDragon"
+                     }
+                  ]
+               }
             },
             {
-                "id": "forest1",
-                "desc": "A wooded slope. You think the you can use it to went down insensibly. However, you don't know where it leads.",
-                "event":
-                {
-                    "text": "You decided to sneak pass the dragon.",
-                    "type": "skillcheck",
-                    "param": "sneaking",
-                    "modifier": -2,
-                    "success":
-                    {
-                        "text": "You sucessfully passed the dragon.",
-                        "events": []
-                    },
-                    "fail":
-                    {
-                        "text": "The dragon noticed you! Prepare to battle!",
-                        "events":
-                        [
-                            {
-                                "type": "mobbattle",
-                                "param": "dragon",
-                                "modifier": 0,
-                                "success":
-                                {
-                                    "text": "You killed the dragon. You understood what helped the dragon to notice you and won't made that mistake in future.",
-                                    "events":
-                                    [
-                                        {
-                                            "type": "mobremove",
-                                            "param": "dragon@mount1"
-                                        },
-                                        {
-                                            "type": "skillinc",
-                                            "param": "melee"
-                                        },
-                                        {
-                                            "type": "skillinc",
-                                            "param": "sneaking"
-                                        }
-                                    ]
-                                },
-                                "fail":
-                                {
-                                    "text": "You lose in battle with dragon.",
-                                    "events":
-                                    [
-                                        {
-                                            "type": "gameover",
-                                            "param": "killedByDragon"
-                                        }
-                                    ]
-                                }
-                            }
+               "id":"forest1",
+               "desc":"A wooded slope. You think the you can use it to went down insensibly. However, you don't know where it leads.",
+               "event":{
+                  "type":"skillcheck",
+                  "param":"sneaking",
+                  "modifier":-2,
+                  "text":"You decided to sneak pass the dragon.",
+                  "success":[
+                     {
+                        "type":"echo",
+                        "text":"You sucessfully passed the dragon."
+                     }
+                  ],
+                  "fail":[
+                     {
+                        "type":"mobbattle",
+                        "param":"dragon",
+                        "modifier":0,
+                        "text":"The dragon noticed you! Prepare to battle!",
+                        "success":[
+                           {
+                              "type":"mobremove",
+                              "param":"dragon@mount1",
+                              "text":"You killed the dragon."
+                           },
+                           {
+                              "type":"skillinc",
+                              "param":"melee"
+                           },
+                           {
+                              "type":"skillinc",
+                              "param":"sneaking",
+                              "text":"You understood what helped the dragon to notice you and won't made that mistake in future."
+                           }
+                        ],
+                        "fail":[
+                           {
+                              "type":"gameover",
+                              "param":"killedByDragon"
+                           }
                         ]
-                    }
-                }
+                     }
+                  ]
+               }
             }
-        ]
-    }
-]
+         ]
+      }
+   ]
 }
