@@ -251,22 +251,21 @@ def runEvent(event):
             addMobSavedInfo(getMob(mobid), "absent", location)
         elif event["type"] == "gameover":
             gameOver(event["param"])
+        elif event["type"] == "echo":
+            # donothing, the message is already displayed.
+            # it is needed only to avoid a "type not found" error 
             
         debugOutputStr("Event '%s' result: %s"%(event["type"], str(result)), 2)
     else:
         debugOutputStr("Event '%s' type not found!"%(str(event)), 10)
-    
-    if "events" in event:
-        for subevent in event["events"]:
-            runEvent(subevent)
-    else:
-        debugOutputStr("Event '%s' subevents not found!"%(str(event)), 10)
         
     if result:
         if "success" in event:
-            runEvent(event["success"])
+        	for subevent in event["success"]:
+            	runEvent(subevent)
     elif "fail" in event:
-        runEvent(event["fail"])
+        for subevent in event["fail"]:
+            	runEvent(subevent)
     
     return result
 
