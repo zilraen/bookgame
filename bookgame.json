@@ -118,6 +118,7 @@
    "items":[
       {
          "id":"mace",
+         "lootable":true,
          "type":{
             "melee":{
                "modifier":2,
@@ -137,6 +138,7 @@
       },
       {
          "id":"dagger",
+         "lootable":true,         
          "type":{
             "melee":{
                "modifier":1,
@@ -165,6 +167,46 @@
          },
          "name":"Short dagger",
          "desc":"Worn but still sharp blade.  5 inch long."
+      },
+      {
+         "id":"tail",
+         "lootable":false,
+         "type":{
+            "melee":{
+               "modifier":1,
+               "use":[
+                  "{0} whips his tail."
+               ],
+               "success":[
+
+               ],
+               "fail":[
+
+               ]
+            }
+         },
+         "name":"Tail",
+         "desc":"An 'item' used by dragon."
+      },
+      {
+         "id":"firebreath",
+         "lootable":false,
+         "type":{
+            "melee":{
+               "modifier":1,
+               "use":[
+                  "{0} breathes fire."
+               ],
+               "success":[
+
+               ],
+               "fail":[
+
+               ]
+            }
+         },
+         "name":"Fire breath",
+         "desc":"An 'item' used by dragon."
       }
    ],
    "player":{
@@ -210,7 +252,11 @@
             }
          },
          "skills":{
-            "melee":3
+            "melee":1
+         },
+         "items":{
+            "tail":1,
+            "firebreath":1
          }
       }
    ],
