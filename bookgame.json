@@ -119,6 +119,7 @@
       {
          "id":"mace",
          "lootable":true,
+         "slot": "hands",
          "type":{
             "melee":{
                "modifier":2,
@@ -138,7 +139,8 @@
       },
       {
          "id":"dagger",
-         "lootable":true,         
+         "lootable":true,
+         "slot": "hands",
          "type":{
             "melee":{
                "modifier":1,
@@ -169,8 +171,42 @@
          "desc":"Worn but still sharp blade.  5 inch long."
       },
       {
+         "id":"heavycloth",
+         "lootable":true,
+         "slot": "cloth",
+         "type":{
+            "evasion":{
+               "modifier":1,
+               "use":[
+                  
+               ],
+               "success":[
+                  "The incoming attack is deflected by {0}'s armor."
+               ],
+               "fail":[
+
+               ]
+            },
+            "climbing":{
+               "modifier":-1,
+               "use":[
+
+               ],
+               "success":[
+                  "Despite the heavy gear, {0} sucessfully climbs."
+               ],
+               "fail":[
+                  "{0} entangle in heavy gear and fall."
+               ]
+            }
+         },
+         "name":"Reinforced cloth",
+         "desc":"A wool jacket and pants reinforced with some leather and metal inserts. It's warm and offers some protection, but is too heavy and clumsy."
+      },
+      {
          "id":"tail",
          "lootable":false,
+         "slot": "tail",
          "type":{
             "melee":{
                "modifier":1,
@@ -191,6 +227,7 @@
       {
          "id":"firebreath",
          "lootable":false,
+         "slot": "breath",
          "type":{
             "melee":{
                "modifier":1,
@@ -229,6 +266,10 @@
          "climbing":3,
          "melee":3
       },
+      "slots":{
+         "hands":"dagger",
+         "cloth":"heavycloth"
+      },
       "items":{
          "dagger":1
       }
@@ -254,9 +295,11 @@
          "skills":{
             "melee":1
          },
+         "slots":{
+            "tail":"tail",
+            "breath":"firebreath"
+         },
          "items":{
-            "tail":1,
-            "firebreath":1
          }
       }
    ],
