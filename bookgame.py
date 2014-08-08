@@ -182,16 +182,27 @@ def printSkills(mob):
             outputShortLine()
             outputStr("%s [%+d]:\n%s"%(skillDef["name"], skillval, skillDef["desc"]["default"]))
 
+def printItem(itemid):
+    if isValidItem(itemid):
+        item = getItem(itemid)
+        outputStr("%s:\n%s"%(item["name"], item["desc"]))
+        for skillid in item["type"].keys():
+            skill = getSkill(skillid)
+            modifier = item["type"][skillid]["modifier"]
+            outputStr("%s: [%+d]"%(skill["name"], modifier))
+
 def printItems(mob):
+    if "slots" in mob:
+        outputStr("Equiped:")
+        for slotid in mob["slots"].keys():
+            itemid = mob["slots"][slotid]
+            outputShortLine()
+            printItem(itemid)
     if "items" in mob:
+        outputStr("\nInventory:")
         for itemid in mob["items"].keys():
             outputShortLine()
-            itemDef = getItem(itemid)
-            outputStr("%s:\n%s"%(itemDef["name"], itemDef["desc"]))
-            for skillid in itemDef["type"].keys():
-                skill = getSkill(skillid)
-                modifier = itemDef["type"][skillid]["modifier"]
-                outputStr("%s: [%+d]"%(skill["name"], modifier))
+            printItem(itemid)
 
 def printMobShortInfo(mob, damage=0):
     name = getName(mob)
@@ -251,22 +262,22 @@ def runEvent(event):
             addMobSavedInfo(getMob(mobid), "absent", location)
         elif event["type"] == "gameover":
             gameOver(event["param"])
+        elif event["type"] == "echo":
+            # donothing, the message is already displayed.
+            # it is needed only to avoid a "type not found" error 
+            pass
             
         debugOutputStr("Event '%s' result: %s"%(event["type"], str(result)), 2)
     else:
         debugOutputStr("Event '%s' type not found!"%(str(event)), 10)
-    
-    if "events" in event:
-        for subevent in event["events"]:
-            runEvent(subevent)
-    else:
-        debugOutputStr("Event '%s' subevents not found!"%(str(event)), 10)
         
     if result:
         if "success" in event:
-            runEvent(event["success"])
+            for subevent in event["success"]:
+                runEvent(subevent)
     elif "fail" in event:
-        runEvent(event["fail"])
+        for subevent in event["fail"]:
+                runEvent(subevent)
     
     return result
 
@@ -281,7 +292,7 @@ def tryKill(pretender, damage):
 def gameOver(gameoverId):
     global gameoverTexts
     
-    # Default text for case is all texts are unavailable. Should be never used.
+    # Default text for case if all gameover texts are unavailable. Should be never used.
     text = "GAME OVER."
     if gameoverId not in gameoverTexts:
         gameoverId = "default"
@@ -303,10 +314,10 @@ def checkSkill(pretender, skillid, mod=0, autosuccess=False):
     printSkillUseDescription(pretender, skillid)
     
     if autosuccess:
-		if skillval > 0:
-			succeedCount = skillval
-		else:
-			succeedCount = 1
+        if skillval > 0:
+            succeedCount = skillval
+        else:
+            succeedCount = 1
     else:
         for i in range(0, skillval):
             dice = diceroll(pretender["diceToSkillcheck"])
@@ -326,11 +337,14 @@ def incSkill(pretender, skillid):
         pretender["skills"][skillid] += 1
     else:
         pretender["skills"][skillid] = 1
-        
+
+def isValidItem(itemid):
+    return getItem(itemid) != {}
+
 def addItem(pretender, itemid):
     if itemid in pretender["items"]:
         pretender["items"][itemid] += 1
-    else:
+    elif isValidItem(itemid):
         pretender["items"][itemid] = 1
 
 def removeItem(pretender, itemid):
@@ -404,13 +418,34 @@ def getItem(itemid):
             return item
     return {}
 
+def hasSlot(mob, slotid):
+    if "slots" in mob:
+        if slotid in mob["slots"]:
+            return mob["slots"][slotid]
+    return None
+
+def equipItem(mob, itemid):
+    item = getItem(itemid)
+    if "slot" in item:
+        slotid = item["slot"]
+        slot = hasSlot(mob, slotid)
+        if slot is not None:
+            unequipItem(mob, slotid)
+            mob["slots"][slotid] = itemid
+
+def unequipItem(mob, slotid):
+    slotitem = hasSlot(mob, slotid)
+    if slotitem is not None:
+        addItem(mob, slotitem)
+        mob["slots"][slotid] = ""
+
 def getAffectingItems(mob, skillid):
     global items
     affectingItems = []
-    if "items" in mob:
-        for itemid in mob["items"].keys():
+    if "slot" in mob:
+        for slotid in mob["slots"].keys():
             for item in items:
-                if item["id"] == itemid:
+                if item["id"] == mob["slots"][slotid]:
                     if skillid in item["type"]:
                         affectingItems.append(item)
     return affectingItems
